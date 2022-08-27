@@ -163,25 +163,24 @@ class RouteResolver
 		$str_uri = $uri;
 		$prefix = self::$route_url_base;
 
-		//logit('_____route::compare', $uri);
-		//logit('___________________[1]', print_r([$uri,$str_route],true));
 		// if strictly equals, no parameters found
-		if ($str_route === $str_uri)
-		{
+		if ($str_route === $str_uri) {
+			logit('::route.found.verbatim', $uri);
+
 			return true;
 		}
 
 		// if equals, ignoring the trailing / at request uri
-		if ($str_route === substr($str_uri,0,-1))
-		{
+		if ($str_route === substr($str_uri,0,-1)) {
+			logit('::route.found', $uri);
+
 			return true;
 		}
 
 		$pattern = fetch_uri_pattern($str_route);
-
 		$res = preg_match($pattern, $str_uri);
 
-		//logit('___________________[2]', print_r([$uri,$pattern,($res?'y':'n')],true));
+		logit('___________________[2]', print_r([$uri,$str_route,$pattern,($res?'y':'n')],true));
 		return $res;
 	}
 
@@ -214,7 +213,7 @@ class RouteResolver
 	 *
 	 *	@static
 	 *	@param	string	$uriOrName
-	 *	@param	string	$httpMethod
+	 *	@param	string	$httpMethod = "GET"
 	 *	@return	\Collei\Http\Routing\Route
 	 */
 	public static function resolve(string $uriOrName, string $httpMethod = 'GET')

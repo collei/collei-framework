@@ -211,8 +211,7 @@ class App
 	 */
 	private function initialize(
 		Request $request, Response $response, Session $session
-	)
-	{
+	) {
 		self::$currentInstance = $this;
 		//
 		$this->loadConfigs();
@@ -225,10 +224,11 @@ class App
 		$this->initializePlatform();
 		$this->initializeSite();
 		//
-		if ($this->hasRouteFor($this->url->path))
-		{
+		if ($this->hasRouteFor($this->url->path)) {
 			$this->assignRoute();
 		}
+
+		logit('NO_ROUTE', "No route\r\n\t\tfor {$this->request->uri}");
 	}
 
 	/**
@@ -324,14 +324,11 @@ class App
 	 */
 	private function runServlet()
 	{
-		if ($this->can_run)
-		{
+		if ($this->can_run) {
 			$this->response = $this->callDispatcher(
 				new ServletDispatcher($this)
 			);
-		}
-		else
-		{
+		} else {
 			$this->response = new Response();
 		}
 	}
@@ -452,21 +449,15 @@ class App
 	 */
 	public function run()
 	{
-		try
-		{
-			if ($this->runFilters())
-			{
+		try {
+			if ($this->runFilters()) {
 				$this->runServlet();
 			}
 			//
 			$this->response->setCookie('vis', date('Y-m-d H:i:s'));
-		}
-		catch (Throwable $t)
-		{
+		} catch (Throwable $t) {
 			$this->prepareErrorResponse($t);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->prepareErrorResponse($ex);
 		}
 		//

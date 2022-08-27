@@ -36,6 +36,9 @@ $request = \Collei\Utils\Runnable\Bolt::returnFrom(function(){
  *	Brings the captured request into Application dominion, in which
  *	we can start processing it.
  */
+
+logit('REQUESTA', print_r($request,true));
+
 $app = \Collei\App\App::start($request);
 
 /**

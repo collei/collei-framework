@@ -1,6 +1,6 @@
 <?php
 
-define('PLAT_NAME', 'plat');
+define('PLAT_NAME', 'collei');
 define('PLAT_FOLDER', basename(dirname(__FILE__, 2)));
 define('PLAT_GROUND', dirname(__FILE__, 2));
 define('DIR_SEP', DIRECTORY_SEPARATOR);

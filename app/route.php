@@ -47,24 +47,6 @@ Router::controller(UserRegisterServlet::class)->group(function() {
 });
 
 /*
-Router::get('/register', UserRegisterServlet::class)
-	->name('plat-register')
-	->servletMethod('register');
-
-Router::post('/register', UserRegisterServlet::class)
-	->servletMethod('registerAction');
-
-Router::get('/mypanel', UserRegisterServlet::class, 'userPanel')
-	->name('plat-userpanel');
-
-Router::get('/mfa-register', UserRegisterServlet::class, 'mfaRegisterStart')
-	->name('plat-mfa-register');
-
-Router::post('/mfa-register', UserRegisterServlet::class, 'mfaRegisterComplete')
-	->name('plat-mfa-register-complete');
-*/
-
-/*
  *	admin panel
  */
 
@@ -80,7 +62,7 @@ out
 */
 
 
-Router::prefix('admin')->group(function() {
+Router::prefix('/admin')->group(function() {
 
 	Router::get('home', AdminPanelServlet::class, 'index')
 		->name('plat-adm-panel');

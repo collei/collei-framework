@@ -9,10 +9,10 @@ storage/logs/
 *.sublime-workspace
 
 # third-party code
-#vendor
-#!vendor/collei/
-#!vendor/autold.php
-#!vendor/basefunc.php
+vendor
+!vendor/collei/
+!vendor/autold.php
+!vendor/basefunc.php
 
 # unnecessary non-source loads
 resources/media/

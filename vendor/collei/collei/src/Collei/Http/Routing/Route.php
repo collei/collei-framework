@@ -261,7 +261,9 @@ class Route
 	 */
 	public function matches(string $uri, string $httpMethod)
 	{
-		$bing = RouteResolver::matchesURI($this, $uri) && in_array($httpMethod, $this->route_methods);
+		$bing = RouteResolver::matchesURI($this, $uri) && in_array(
+			$httpMethod, $this->route_methods
+		);
 
 		return $bing;
 	}

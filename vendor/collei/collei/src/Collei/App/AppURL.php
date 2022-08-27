@@ -72,10 +72,11 @@ class AppURL extends URL
 		}
 
 		$fldr = $this->app_folder;
+		$flroot = $this->app_root;
 		$ground = PLAT_GROUND . str_replace('/', DIRECTORY_SEPARATOR, $this->app_root);
 		if (!is_dir($ground) && !is_dir(dirname($ground)))
 		{
-			logerror('app_not_loadable', "There is no App set for handling this request path: $request_uri \r\n\t\ton $ground\r\n\t\ton $fldr ");
+			logerror('app_not_loadable', "There is no App set for handling this request path: $request_uri \r\n\t\ton $ground\r\n\t\ton $fldr\r\n\t\twithin $flroot");
 			return;
 		}
 
@@ -93,8 +94,6 @@ class AppURL extends URL
 		parent::__construct($url);
 		$this->prospectRoot();
 		$this->locateGround();
-
-		//logit('ROUTESTUDY', print_r(['for' => $url, 'do' => $this], true));
 	}
 
 	/**

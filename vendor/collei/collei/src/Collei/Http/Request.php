@@ -122,13 +122,13 @@ class Request implements Routeable, Capturable
 		{
 			if ($n == 'REQUEST_URI')
 			{
-				if (Str::startsWith($v, '/plat/'))
+				if (Str::startsWith($v, '/' . PLAT_NAME . '/'))
 				{
 					$server_vars[$n] = '/' . substr($v, 6);
 					/*
 					 *	observes root folder on requests and routes
 					 */
-					$this->uriRootFolder = '/plat/';
+					$this->uriRootFolder = '/' . PLAT_NAME . '/';
 				}
 				else
 				{
@@ -459,12 +459,12 @@ class Request implements Routeable, Capturable
 		$uri = $request->uri;
 		$file = '';
 
-		if ($request->matches('#^\/sites\/resources\/(.*)#'))
+		if ($request->matches('#^\/' . PLAT_NAME . '\/resources\/(.*)#'))
 		{
 			$file = \Collei\Utils\Str::trimPrefix($uri, '/sites');
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $file));
 		}
-		elseif ($request->matches('#^\/sites\/([^\/]+)\/resources\/(.*)#'))
+		elseif ($request->matches('#^\/' . PLAT_NAME . '\/([^\/]+)\/resources\/(.*)#'))
 		{
 			$file = str_replace('/', DIRECTORY_SEPARATOR, $uri);
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $uri));
