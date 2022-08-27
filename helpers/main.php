@@ -106,11 +106,13 @@ if (!function_exists('route'))
 	{
 		$route = RouteResolver::resolveByName($name);
 
-		if (is_array($arguments))
-		{
+		logit("helper:route('$name')", print_r($route,true));
+
+		//
+		if (is_array($arguments)) {
 			return $route->assign(...$arguments)->getAssigned();
 		}
-
+		//
 		return $route;
 	}
 }

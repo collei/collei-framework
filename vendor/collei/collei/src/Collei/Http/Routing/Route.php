@@ -80,7 +80,9 @@ class Route
 	 */
 	private function groundizePath()
 	{
-		$this->servlet_path = RouteResolver::groundizeServletPath($this->servlet_class);
+		$this->servlet_path = RouteResolver::groundizeServletPath(
+			$this->servlet_class
+		);
 	}
 
 	/**
@@ -92,8 +94,13 @@ class Route
 	 *	@param	string	$servletMethod
 	 *	@param	string	$appName
 	 */
-	public function __construct($routeMethod, string $path, string $servletClass, string $servletMethod = null, string $appName = null)
-	{
+	public function __construct(
+		$routeMethod,
+		string $path,
+		string $servletClass,
+		string $servletMethod = null,
+		string $appName = null
+	) {
 		if (is_array($routeMethod)) {
 			foreach ($routeMethod as $m) {
 				$this->route_methods[] = strtoupper($m);
@@ -144,24 +151,19 @@ class Route
 	 */
 	public function __get($name)
 	{
-		if ($name == 'name')
-		{
+		if ($name == 'name') {
 			return $this->name;
 		}
-		if ($name == 'path')
-		{
+		if ($name == 'path') {
 			return $this->route_path;
 		}
-		if ($name == 'assignedPath')
-		{
+		if ($name == 'assignedPath') {
 			return $this->route_assigned_path;
 		}
-		if ($name == 'site')
-		{
+		if ($name == 'site') {
 			return $this->route_owner;
 		}
-		if ($name == 'isVariable')
-		{
+		if ($name == 'isVariable') {
 			return $this->route_is_variable;
 		}
 		return '';
@@ -212,32 +214,25 @@ class Route
 	public function assign(...$arguments)
 	{
 		$path = $this->route_path;
-
-		foreach ($arguments as $argument)
-		{
-			if (is_array($argument))
-			{
-				foreach ($argument as $n => $v)
-				{
-					if (Str::has('{' . $n . '}', $path))
-					{
+		//
+		foreach ($arguments as $argument) {
+			if (is_array($argument)) {
+				foreach ($argument as $n => $v) {
+					if (Str::has('{' . $n . '}', $path)) {
 						$path = Str::replace('{' . $n . '}', $v, $path);
 					}
 				}
-			}
-			else
-			{
+			} else {
 				$named = Str::getNamedArg($path, 1, '{', '}');
-
-				if (empty($named))
-				{
+				//
+				if (empty($named)) {
 					break;
 				}
-				
+				//
 				$path = Str::replace('{' . $named . '}', $argument, $path);
 			}
 		}
-
+		//
 		$this->route_assigned_path = $path;
 		return $this;
 	}
@@ -264,7 +259,7 @@ class Route
 		$bing = RouteResolver::matchesURI($this, $uri) && in_array(
 			$httpMethod, $this->route_methods
 		);
-
+		//
 		return $bing;
 	}
 

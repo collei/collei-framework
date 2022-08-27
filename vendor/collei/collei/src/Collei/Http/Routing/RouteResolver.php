@@ -79,23 +79,24 @@ class RouteResolver
 	public static function groundizeServletPath(string $servletClass)
 	{
 		self::init();
+		$ds = DIRECTORY_SEPARATOR;
 		$app_servlet_path = '';
-
-		if (!is_null(self::$app_request))
-		{
+		//
+		if (!is_null(self::$app_request)) {
 			$app_root_uri = self::$app_instance->getRootURI();
-			$app_servlet_path = PLAT_GROUND . DIRECTORY_SEPARATOR . $app_root_uri . DIRECTORY_SEPARATOR . $servletClass . PLAT_CLASSES_SUFFIX;
+			$app_servlet_path = PLAT_GROUND
+				. DIRECTORY_SEPARATOR . $app_root_uri
+				. DIRECTORY_SEPARATOR . $servletClass . PLAT_CLASSES_SUFFIX;
+		} else {
+			$app_servlet_path = PLAT_GROUND
+				. DIRECTORY_SEPARATOR . $servletClass . PLAT_CLASSES_SUFFIX;
 		}
-		else
-		{
-			$app_servlet_path = PLAT_GROUND . DIRECTORY_SEPARATOR . $servletClass . PLAT_CLASSES_SUFFIX;
-		}
-
-		$app_servlet_path = str_replace('/', DIRECTORY_SEPARATOR, $app_servlet_path);
-		$app_servlet_path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $app_servlet_path);
-		$app_servlet_path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $app_servlet_path);
-		$app_servlet_path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $app_servlet_path);
-
+		//
+		$app_servlet_path = str_replace('/', $ds, $app_servlet_path);
+		$app_servlet_path = str_replace("$ds$ds$ds$ds", $ds, $app_servlet_path);
+		$app_servlet_path = str_replace("$ds$ds$ds", $ds, $app_servlet_path);
+		$app_servlet_path = str_replace("$ds$ds", $ds, $app_servlet_path);
+		//
 		return $app_servlet_path;
 	}
 
@@ -121,19 +122,34 @@ class RouteResolver
 	 *	@param	string	$appName
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function makeRoute($routeMethod, string $path, string $servletClass, string $servletMethod = null, string $appName = null)
-	{
+	public static function makeRoute(
+		$routeMethod,
+		string $path,
+		string $servletClass,
+		string $servletMethod = null,
+		string $appName = null
+	) {
 		self::init();
-
-		$pathPrefix = (empty($appName) ? PLAT_SITES_BASEURL : (PLAT_SITES_BASEURL . '/' . $appName));
-
-		$route = new Route($routeMethod, $pathPrefix . $path, $servletClass, $servletMethod, $appName);
+		//
+		$pathPrefix = (empty($appName)
+			? PLAT_SITES_BASEURL 
+			: (PLAT_SITES_BASEURL . '/' . $appName)
+		);
+		//
+		$route = new Route(
+			$routeMethod,
+			$pathPrefix . $path,
+			$servletClass,
+			$servletMethod,
+			$appName
+		);
 		self::$route_list[] = $route;
 		return $route;
 	}
 
 	/**
-	 *	Creates and adds a Default Route for any request not matched by any other route
+	 *	Creates and adds a Default Route for any request not matched by
+	 *	not matched by any other route
 	 *
 	 *	@static
 	 *	@param	string	$servletClass
@@ -141,10 +157,15 @@ class RouteResolver
 	 *	@param	string	$appName
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function makeDefaultRoute(string $servletClass, string $servletMethod = null, string $appName = null)
-	{
+	public static function makeDefaultRoute(
+		string $servletClass,
+		string $servletMethod = null,
+		string $appName = null
+	) {
 		self::init();
-		$route = new Route(Router::verbs(), '*', $servletClass, $servletMethod, $appName);
+		$route = new Route(
+			Router::verbs(), '*', $servletClass, $servletMethod, $appName
+		);
 		self::$route_default[ $appName ?? PLAT_NAME ] = $route;
 		return $route;
 	}
@@ -162,24 +183,22 @@ class RouteResolver
 		$str_route = $route->getPath();
 		$str_uri = $uri;
 		$prefix = self::$route_url_base;
-
+		//
 		// if strictly equals, no parameters found
 		if ($str_route === $str_uri) {
 			logit('::route.found.verbatim', $uri);
-
 			return true;
 		}
-
+		//
 		// if equals, ignoring the trailing / at request uri
 		if ($str_route === substr($str_uri,0,-1)) {
 			logit('::route.found', $uri);
-
 			return true;
 		}
-
+		//
 		$pattern = fetch_uri_pattern($str_route);
 		$res = preg_match($pattern, $str_uri);
-
+		//
 		logit('___________________[2]', print_r([$uri,$str_route,$pattern,($res?'y':'n')],true));
 		return $res;
 	}
@@ -194,17 +213,15 @@ class RouteResolver
 	protected static function getDefaultRouteFor(string $appName = null)
 	{
 		$appName = $appName ?? PLAT_NAME;
-
-		if (array_key_exists($appName, self::$route_default))
-		{
+		//
+		if (array_key_exists($appName, self::$route_default)) {
 			return self::$route_default[$appName];
 		}
-
-		if (array_key_exists(PLAT_NAME, self::$route_default))
-		{
+		//
+		if (array_key_exists(PLAT_NAME, self::$route_default)) {
 			return self::$route_default[PLAT_NAME];
 		}
-
+		//
 		return null;
 	} 
 
@@ -218,18 +235,14 @@ class RouteResolver
 	 */
 	public static function resolve(string $uriOrName, string $httpMethod = 'GET')
 	{
-		foreach (self::$route_list as $route_item)
-		{
-			if ($route_item->name === $uriOrName)
-			{
+		foreach (self::$route_list as $route_item) {
+			if ($route_item->name === $uriOrName) {
 				return $route_item;
-			}
-			elseif ($route_item->matches($uriOrName, $httpMethod))
-			{
+			} elseif ($route_item->matches($uriOrName, $httpMethod)) {
 				return $route_item;
 			}
 		}
-
+		//
 		return self::getDefaultRouteFor(
 			self::$app_instance->getSite()
 		);
@@ -244,14 +257,12 @@ class RouteResolver
 	 */
 	public static function resolveByName(string $routeName)
 	{
-		foreach (self::$route_list as $route_item)
-		{
-			if ($route_item->name == $routeName)
-			{
+		foreach (self::$route_list as $route_item) {
+			if ($route_item->name == $routeName) {
 				return $route_item;
 			}
 		}
-
+		//
 		return self::getDefaultRouteFor(
 			self::$app_instance->getSite()
 		);

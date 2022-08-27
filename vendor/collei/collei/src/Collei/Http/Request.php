@@ -64,14 +64,12 @@ class Request implements Routeable, Capturable
 	{
 		$verb = strtoupper($this->server->get('REQUEST_METHOD'));
 		//
-		if (!in_array($verb, ['GET','HEAD']))
-		{
+		if (!in_array($verb, ['GET','HEAD'])) {
 			$put_vars = (
 				new RawRequestBodyParser(file_get_contents("php://input"))
 			)->getFields()->asArray();
-
-			if (!empty($put_vars))
-			{
+			//
+			if (!empty($put_vars)) {
 				$this->form->adds($put_vars, true);
 				//
 				return true;
@@ -89,23 +87,20 @@ class Request implements Routeable, Capturable
 	private function extractHeaderDataFromServerVariables()
 	{
 		$http_headers = [];
-		$capitalize_first = function($str)
-		{
+		$capitalize_first = function($str) {
 			return strtoupper(substr($str,0,1)) . strtolower(substr($str,1));
 		};
-
-		foreach ($_SERVER as $n => $v)
-		{
-			if (str_starts_with($n, 'HTTP_'))
-			{
+		//
+		foreach ($_SERVER as $n => $v) {
+			if (str_starts_with($n, 'HTTP_')) {
 				$arr_n = explode('_',$n);
 				$arr_n = array_map($capitalize_first, $arr_n);
 				$transformed_n = implode('-',$arr_n);
-
+				//
 				$http_headers[$transformed_n] = $v;
 			}
 		}
-
+		//
 		return $http_headers;
 	}
 
@@ -117,30 +112,24 @@ class Request implements Routeable, Capturable
 	private function preProcessServerVars()
 	{
 		$server_vars = [];
-
-		foreach ($_SERVER as $n => $v)
-		{
-			if ($n == 'REQUEST_URI')
-			{
-				if (Str::startsWith($v, '/' . PLAT_NAME . '/'))
-				{
-					$server_vars[$n] = '/' . substr($v, 6);
-					/*
-					 *	observes root folder on requests and routes
-					 */
-					$this->uriRootFolder = '/' . PLAT_NAME . '/';
-				}
-				else
-				{
+		//
+		foreach ($_SERVER as $n => $v) {
+			if ($n == 'REQUEST_URI') {
+				$starter = ('/' . PLAT_NAME . '/');
+				//
+				if (Str::startsWith($v, $starter)) {
+					$server_vars[$n] = '/' . substr($v, strlen($starter));
+					//
+					// observes root folder on requests and routes
+					$this->uriRootFolder = $starter;
+				} else {
 					$server_vars[$n] = $v;
 				}
-			}
-			else
-			{
+			} else {
 				$server_vars[$n] = $v;
 			}
 		}
-
+		//
 		return $server_vars;
 	}
 
@@ -191,8 +180,7 @@ class Request implements Routeable, Capturable
 		$path_route = $this->route->getPath();
 		$route_params = fetch_uri_parameters($path_request, $path_route);
 
-		if (!is_null($route_params))
-		{
+		if (!is_null($route_params)) {
 			$this->attributes->adds($route_params);
 		}
 	}
@@ -215,18 +203,15 @@ class Request implements Routeable, Capturable
 		// allow redefine the request verb for other than GET/POST
 		// by using @method('METHOD') inside the form in a view,
 		// so they can match its related route 
-		if ($this->request_method === 'POST')
-		{
-			if ($this->form->has('_method'))
-			{
+		if ($this->request_method === 'POST') {
+			if ($this->form->has('_method')) {
 				$this->request_method = $this->form->get('_method');
 			}
 		}
 
 		// gathers and preserves the query string, if any,
 		// so it can be used later, if needed.
-		if (($question = strpos($this->request_path, '?')) !== false)
-		{
+		if (($question = strpos($this->request_path, '?')) !== false) {
 			$this->request_path = substr($this->request_path, 0, $question);
 		}
 	}
@@ -351,16 +336,13 @@ class Request implements Routeable, Capturable
 	 */
 	public function getParameter(string $param)
 	{
-		if ($this->attributes->has($param))
-		{
+		if ($this->attributes->has($param)) {
 			return $this->attributes->get($param);
 		}
-		if ($this->form->has($param))
-		{
+		if ($this->form->has($param)) {
 			return $this->form->get($param);
 		}
-		if ($this->query->has($param))
-		{
+		if ($this->query->has($param)) {
 			return $this->query->get($param);
 		}
 		return null;
