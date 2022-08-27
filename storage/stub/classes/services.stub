@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Services;
+
+use Collei\Services\Service;
+use Collei\Utils\Arr;
+use Collei\Utils\Str;
+
+/**
+ *	This allow reuse of code and funcionality injection.
+ *	Basic capabilities available through base service.
+ *
+ */
+class {className} extends Service
+{
+	public function makeGreetingTo($someone)
+	{
+		return "Hello, $someone.";
+	}
+
+}
+

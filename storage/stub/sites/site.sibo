@@ -1,0 +1,98 @@
+::dir "__SITENAME__"
+::dir "__SITENAME__"
+::dir "__SITENAME__/app/servlets"
+::dir "__SITENAME__/app/services"
+::dir "__SITENAME__/app/filters"
+::dir "__SITENAME__/app/commands"
+::dir "__SITENAME__/resources"
+::dir "__SITENAME__/resources/views"
+::dir "__SITENAME__/resources/css"
+::dir "__SITENAME__/resources/js"
+::dir "__SITENAME__/resources/media"
+::dir "__SITENAME__/resources/files"
+
+
+::file "__SITENAME__/.dbc"
+[db]
+driver=mysql
+database=__DBNAME__
+server=__DBSERVER__
+port=3306
+charset=UTF-8
+user=__DBUSER__
+pass=__DBPASSWORD__
+dsn=sqlsrv:UID={db.user};PWD={db.pass};Server={db.server};Database={db.database}
+::endfile
+
+
+::file "__SITENAME__/database.php"
+<?php
+use Collei\Database\Meta\DS;
+use Collei\Database\Meta\Table;
+use Collei\Database\Meta\Database;
+use Collei\Utils\Files\ConfigFile;
+
+/*
+ *	database structure
+ */
+DS::database('__DBNAME__', function(Database $db){
+
+	$conf = ConfigFile::from(grounded('.dbc'));
+
+	$db->parameter('driver', $conf->get('db.driver'));
+	$db->parameter('dsn', $conf->get('db.dsn'));
+	$db->parameter('username', $conf->get('db.user'));
+	$db->parameter('password', $conf->get('db.pass'));
+	$db->parameter('database', $conf->get('db.db'));
+
+	$db->table('comments', function(Table $table){
+		$table->increments('id');
+		$table->string('name', 60);
+		$table->string('description', 250);
+	});
+
+	$db->connect();
+
+});
+::endfile 
+
+
+::file "__SITENAME__/route.php"
+<?php
+use Collei\Http\Routing\Router;
+use App\Servlets\HomePageServlet;
+//
+Router::get('/home', HomePageServlet::class, 'home')->name('index-page');
+//
+::endfile 
+
+
+::file "__SITENAME__/resources/views/index.vis.php"
+@extends('layout.generic')
+
+@section('site-content')
+	@inject('baga','App\Services\RelogioService')
+	@inject('dately','Dately\Dately')
+				<div class="col-md-12 justify-content-center">
+					<h1>Contact List</h1>
+					<p>Designed for managing your contact list and related data, such as phone numbers, mail addresses, and so on.</p>
+					<p>You can...</p>
+					<ul>
+						<li>...<a href="">view</a>, add, modify, remove people.
+						<li>...<a href="">include</a> and maintain related contact data.
+						<li>...<a href="">tag</a> people as and how you want.
+						<li>...<a href="">Now's</a> {{ $dately::now()->format('d/m/Y H:i:s |u|') }}.
+						<li>...<a href="">Holy Friday's</a> {{ $dately::parse('2022-04-15')->format('d/m/Y') }}.
+						<li>...<a href="">É Hoje?</a> {{ ($dately::now()->between('2022-04-15','2022-04-15 23:59:59') ? 'sim' : 'não') }}.
+						<li>...<a href="">E...?</a> {{ ($dately::now()->lessThan('2022-04-15') ? 'tá vindo' : 'é hoje ou já passou') }}.
+					</ul>
+				</div>
+
+				<div>
+					<pre>
+{{ print_r($GLOBALS['__app.plugins'], true) }}
+					</pre>
+				</div>
+@endsection
+::endfile 
+

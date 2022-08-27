@@ -1,0 +1,26 @@
+{
+	"name": "collei/collei-language",
+	"description": "Collei Language Tools",
+    "keywords": ["collei", "language", "conlang", "php"],
+    "homepage": "https://github.com/collei/collei-language",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Collei Inc.",
+            "email": "collei@collei.com.br"
+        }
+    ],
+    "require": {
+        "php": "^7.4||^8.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "ColleiLang\\": "src/ColleiLang"
+        }
+    }
+}
+

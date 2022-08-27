@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Filters;
+
+use Collei\Http\Filters\Filter;
+
+/**
+ *	This works filtering requests.
+ *	Basic capabilities available through base servlet.
+ *
+ */
+class {className} extends Filter
+{
+
+	/**
+	 *	allows ignore this filter for certain requests
+	 *
+	 *	@return array 	List of rules in format '<verb> <uri>'. 
+	 *					<verb> must be a valid HTTP verb or an asterisk.
+	 *					<uri> must be a valid route URI or an asterisk.
+	 *					Both are optional.
+	 *					An '' (empty) line or a '* *'
+	 *					(astyerisk-space-asterisk) item
+	 *					can disable the filter
+	 */
+	public function except()
+	{
+		return [];
+	}
+
+	/**
+	 *	performs checks and can modify requests accordingly.
+	 *
+	 *	@return	bool	true if a given request passes the check, false otherwise.
+	 *					It serves also for statictics, user tracking, etc.
+	 *					(e.g., do the site visitor stats and then return true)
+	 */
+	public function filter()
+	{
+		return true;
+	}
+	
+}
+

@@ -1,0 +1,12 @@
+<?php
+
+require_once '../vendor/autold.php';
+
+$app = \Collei\Console\ConsoleApp::start(
+	\Collei\Console\CommandLine::capture($argv)
+);
+
+$app->run();
+
+echo "\r\n:.\r\n";
+

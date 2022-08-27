@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Servlets;
+
+use Collei\Http\HttpServlet;
+use Collei\Http\Request;
+
+/**
+ *	this processes requests and returns results.
+ *	Basic capabilities available through base servlet.
+ *
+ */
+class {className} extends HttpServlet
+{
+	public function index(Request $request)
+	{
+		return view('index');
+	}
+
+	public function pageNotFound(Request $request)
+	{
+		$this->session->flash('error', 'This page does not exist: ' . $request->uri);
+
+		redirect('/home');
+	}
+
+}
+

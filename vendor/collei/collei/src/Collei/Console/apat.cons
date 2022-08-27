@@ -1,0 +1,53 @@
+supported-arguments:
+	{com}
+	{com?}
+	{com=standard}
+	{com*}
+	{com?*}
+	{com=*}
+supported-options:
+	{--opt}
+	{--opt=standard}
+	{--opt=*}
+	{-O|--opt}
+	{-O|--opt=standard}
+	{-O|--opt=*}
+regex-argument:
+	(\w[\w:\-]*)(\?\*|[?*])?(=("[^"]*"|'[^']*'|[^\s}]*)?)?
+regex-option:
+	(-(\w)\|)?(--(\w[\w\-]*\w))(=("[^"]*"|'[^']*'|[^\s}]*)?)?
+regex-explain:
+	(\s*:\s*([^}]+))?
+regex:
+	\{\s*((\w[\w:\-]*)(\?\*|[?*])?(=("[^"]*"|'[^']*'|[^\s}]*)?)?|(-(\w)\|)?(--(\w[\w\-]*\w))(=("[^"]*"|'[^']*'|[^\s}]*)?)?)(\s*:\s*([^}]+))?\s*\}
+sample-arguments:
+	simple {mandatory} {optional?} {optional-valued="default value"} {valued2=myvalue}
+	multi {oneormore*} {zeroormore?*}
+	explained1 {mandatory : this is mandatory }
+	explained2 {optional? :this is optional}
+	explained3 {optional-valued="reality of salaries" : explanation of inflation } 
+options:
+	simplefull {--alpha} {-B|--bravo} {-m|--multi=*}
+	valued {--charlie=private-value} {-D|--delta=with-masks}
+	valued2 {--charlie="private value"} {-D|--delta='com máscaras'}
+	explained1 {--alpha : first letter }
+	explained2 {-B|--bravo : second one }
+	explained3 {--charlie=private-value : long puro }
+	explained4 {-D|--delta=with-masks : short puro }
+	explained5 {--charlie="private value" : long com aspas }
+	explained6 {-D|--delta='com máscaras' : short com plicas }
+regex-index-parts:
+	arg-nome 2
+	arg-signal 3 (?=optional, *=array)
+	arg-default-val 5
+	opt-name 9
+	opt-short 7
+	opt-default-val 11 (*=array)
+	gen-descr 13
+regex-single-crude-arguments:
+	^((-(\w)|--(\w[\w\-:]*\w))(=(.*)|)?|(.*))$
+regex-single-crude-arguments-index-parts:
+	opt-shortcut 3
+	opt-name 4
+	opt-value 6
+	arg-value 7

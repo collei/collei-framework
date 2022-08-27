@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Model;
+
+use Collei\Database\Yanfei\Model;
+
+/**
+ *	This embodies entity backed by the corresponding DB table
+ *	Basic capabilities available through base model.
+ *
+ */
+class {className} extends Model
+{
+
+}
+

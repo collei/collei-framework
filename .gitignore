@@ -1,0 +1,28 @@
+# general config (passwords here too)
+conf/
+
+# generated files and storage 
+#/console/\.*
+storage/cache/
+storage/logs/
+*.sublime-project
+*.sublime-workspace
+
+# third-party code
+#vendor
+#!vendor/collei/
+#!vendor/autold.php
+#!vendor/basefunc.php
+
+# unnecessary non-source loads
+resources/media/
+resources/files/
+resources/images/
+sites/**/resources/media/
+sites/**/resources/files/
+sites/**/resources/images/
+
+#config files such as .htaccess and .env
+\.*
+!.gitignore
+

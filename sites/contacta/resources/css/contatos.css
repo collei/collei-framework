@@ -1,0 +1,135 @@
+
+.pointer
+	{ cursor: pointer !important; }
+
+.headlined
+	{ margin: 1.25em 0 0.75em 0; border-width: 1px 0 1px 0; border-style: solid; border-color: #000; padding: 2px 0 6px 0; }
+
+/* Hydro */
+.xingqiu,
+.mona,
+.barbara,
+.tartaglia,
+.kokomi,
+.kamisato-ayato,
+.yelan
+	{ color: #02F; }
+/* Pyro */
+.yanfei,
+.amber,
+.yoimiya,
+.diluc,
+.klee,
+.bennett,
+.xiangling,
+.thoma
+	{ color: #F00; }
+/* Geo */
+.zhongli,
+.noelle,
+.ningguang,
+.albedo,
+.yunjin,
+.arataki-itto,
+.gorou
+	{ color: #C72; }
+/* Cryo */
+.eula,
+.rosaria,
+.chongyun,
+.kamisato-ayaka,
+.ganyu,
+.kaeya,
+.qiqi,
+.diona,
+.aloy,
+.shenhe,
+.tsaritsa
+	{ color: #7DD; }
+/* Electro */
+.fischl,
+.keqing,
+.shogun-raiden,
+.beidou,
+.razor,
+.lisa,
+.kujou-sara,
+.kuki-shinobu
+	{ color: #B0B; }
+/* Anemo */
+.venti,
+.jean,
+.sucrose,
+.kaedehara-kazuha,
+.xiao,
+.sayu,
+.shikanoin-heizou
+	{ color: #02FDA3; }
+/* Dendro */
+.baizhu,
+.collei,
+.kusanali
+	{ color: #3B0; }
+
+div.tagpills-edit
+{
+	border: 1px solid #999;
+	border-radius: 11px;
+	min-height: 50% !important;
+	padding: 0.3em;
+	margin: 0.75em;
+}
+
+div.tagpills-edit > div,
+div.tagpills-edit > div.tagpill-new
+{
+	display: inline-block !important;
+	padding: 0.25em 0.8em 0.25em 1em !important;
+	margin: 0.25em !important;
+	border-radius: 1.5em !important;
+}
+
+div.tagpills-edit > div > div.edit
+{
+	display: inline-block;
+	border: 0;
+	padding: 0 0.25em 0 0;
+	margin: 0 0.5em 0 0;
+	font-weight: 600;
+}
+
+div.tagpills-edit > div > button.remove
+{
+	font-weight: 600;
+	display: inline-block;
+	line-height: 70%;
+	padding: 0.45em;
+	vertical-align: middle;
+	margin: 0 -0.6em 0 0;
+	border-radius: 1.5em;
+	border: 1px outset #fff;
+}
+
+div.tagpills-edit > div.tagpill-new
+{
+	border: 0.5px solid #aaa;
+	abackground-color: #bbb;
+}
+
+div.tagpills-edit > div.tagpill-new > input
+{
+	border: 0;
+	background-color: transparent;
+}
+
+.readable {
+	color: white !important;
+	text-shadow:
+		0.06em 0 black,
+		0 0.06em black,
+		-0.06em 0 black,
+		0 -0.06em black;
+}
+
+
+
