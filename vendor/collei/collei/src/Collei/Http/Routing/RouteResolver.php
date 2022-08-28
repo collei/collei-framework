@@ -199,7 +199,6 @@ class RouteResolver
 		$pattern = fetch_uri_pattern($str_route);
 		$res = preg_match($pattern, $str_uri);
 		//
-		logit('___________________[2]', print_r([$uri,$str_route,$pattern,($res?'y':'n')],true));
 		return $res;
 	}
 

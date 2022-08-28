@@ -1,6 +1,7 @@
 <?php
 
 define('PLAT_NAME', 'collei');
+define('PLAT_ROOT_URI', 'sites');
 define('PLAT_FOLDER', basename(dirname(__FILE__, 2)));
 define('PLAT_GROUND', dirname(__FILE__, 2));
 define('DIR_SEP', DIRECTORY_SEPARATOR);

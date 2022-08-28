@@ -1,7 +1,6 @@
 <?php
 
 use Collei\Http\Routing\Router;
-//use Collei\Console\Routing\CommandEntries;
 
 use App\Servlets\LogonServlet;
 use App\Servlets\IndexPageServlet;
@@ -49,21 +48,7 @@ Router::controller(UserRegisterServlet::class)->group(function() {
 /*
  *	admin panel
  */
-
-/*
-in "/admin"
-	for "/home" do AdminPanelServlet::index as "plat-index"
-
-	within UserManagerServlet::class
-		for "/users" do :index as "plat-adm-users"
-	without
-out
-
-*/
-
-
 Router::prefix('/admin')->group(function() {
-
 	Router::get('home', AdminPanelServlet::class, 'index')
 		->name('plat-adm-panel');
 
@@ -72,7 +57,6 @@ Router::prefix('/admin')->group(function() {
 	 */
 	Router::controller(UserManagerServlet::class)->group(function() {
 		Router::get('users', 'index')->name('plat-adm-users');
-
 		Router::get('users/{user_id}', 'detail');
 		Router::post('users/{user_id}/sites/{site_id}/roles/{role_id}', 'setRoleOnSite');
 		Router::post('users/{user_id}/changepassword', 'setNewPassword');
@@ -84,7 +68,6 @@ Router::prefix('/admin')->group(function() {
 	 */
 	Router::controller(RoleManagerServlet::class)->group(function() {
 		Router::get('roles', 'index')->name('plat-adm-roles');
-
 		Router::post('roles', 'create');
 		Router::get('roles/{role_id}', 'detail');
 		Router::post('roles/{role_id}', 'modify');
@@ -94,8 +77,7 @@ Router::prefix('/admin')->group(function() {
 	 *	sites manager
 	 */
 	Router::controller(SiteManagerServlet::class)->group(function() {
-		Router::get('siteman', 'index')
-			->name('plat-adm-sites');
+		Router::get('siteman', 'index')->name('plat-adm-sites');
 
 		Router::post('siteman', 'create');
 		Router::get('siteman/{site_id}', 'detail')->name('plat-adm-siteman-detail');

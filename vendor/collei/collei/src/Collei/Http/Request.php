@@ -441,12 +441,12 @@ class Request implements Routeable, Capturable
 		$uri = $request->uri;
 		$file = '';
 
-		if ($request->matches('#^\/' . PLAT_NAME . '\/resources\/(.*)#'))
+		if ($request->matches('#^\/' . PLAT_ROOT_URI . '\/resources\/(.*)#'))
 		{
 			$file = \Collei\Utils\Str::trimPrefix($uri, '/sites');
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $file));
 		}
-		elseif ($request->matches('#^\/' . PLAT_NAME . '\/([^\/]+)\/resources\/(.*)#'))
+		elseif ($request->matches('#^\/' . PLAT_ROOT_URI . '\/([^\/]+)\/resources\/(.*)#'))
 		{
 			$file = str_replace('/', DIRECTORY_SEPARATOR, $uri);
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $uri));

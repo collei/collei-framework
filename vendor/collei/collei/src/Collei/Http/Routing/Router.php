@@ -308,7 +308,7 @@ class Router
 		// the folder in which "the folder in which the 'route.php' file is" is
 		$folder_grandpa = basename(dirname(dirname($ca_file)));
 
-		if (($folder_grandpa == PLAT_NAME) && ($folder_parent == PLAT_APP_FOLDER_NAME))
+		if (($folder_grandpa == PLAT_FOLDER) && ($folder_parent == PLAT_APP_FOLDER_NAME))
 		{
 			return null;
 		}
@@ -325,43 +325,42 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function makeRoute($routeMethod, string $path, string $servletClass, string $servletMethod = null)
-	{
+	public static function makeRoute(
+		$routeMethod,
+		string $path,
+		string $servletClass,
+		string $servletMethod = null
+	) {
 		$appName = self::fetchBaseAppCaller();
-///*
+		//
 		if ($attr = self::getActiveGroup())
 		{
-			if (($o_path = self::getAccumulatedPath()))
-			{
+			if (($o_path = self::getAccumulatedPath())) {
 				$o_path .= '/' . Str::trimPrefix($path, '/');
-			}
-			else
-			{
+			} else {
 				$o_path = $path;
 			}
-
-			if (!Str::startsWith($o_path, '/'))
-			{
+			//
+			if (!Str::startsWith($o_path, '/')) {
 				$o_path = '/' . $o_path;
 			}
-
+			//
 			$o_method = $servletClass;
-
-			if (!$o_controller = self::getGroupController())
-			{
+			//
+			if (!$o_controller = self::getGroupController()) {
 				$o_method = $servletMethod;
 				$o_controller = $servletClass;
 			}
-
-/*			logit(__METHOD__, print_r([
+			//
+			logit(__METHOD__, print_r([
 				'route' => "({$routeMethod})({$o_controller}.{$o_method})",
 				'path' => $path,
 				'cold' => $o_path,
 			], true));
-*/
+			//
 			return RouteResolver::makeRoute($routeMethod, $o_path, $o_controller, $o_method, $appName);
 		}
-//*/
+		//
 		return RouteResolver::makeRoute($routeMethod, $path, $servletClass, $servletMethod, $appName);
 	}
 
