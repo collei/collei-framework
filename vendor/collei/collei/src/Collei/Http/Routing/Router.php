@@ -308,8 +308,10 @@ class Router
 		// the folder in which "the folder in which the 'route.php' file is" is
 		$folder_grandpa = basename(dirname(dirname($ca_file)));
 
-		if (($folder_grandpa == PLAT_FOLDER) && ($folder_parent == PLAT_APP_FOLDER_NAME))
-		{
+		if (
+			($folder_grandpa == PLAT_FOLDER) &&
+			($folder_parent == PLAT_APP_FOLDER_NAME)
+		) {
 			return null;
 		}
 		return $folder_parent;

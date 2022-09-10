@@ -172,7 +172,7 @@ abstract class HttpServlet extends Servlet
 		// basic types and default values
 		$atomic = [
 			'array' => [],
-			'callable' => (function(){ return false; }),
+			'callable' => (function(...$params){ return false; }),
 			'bool' => false,
 			'float' => 0.0,
 			'int' => 0,

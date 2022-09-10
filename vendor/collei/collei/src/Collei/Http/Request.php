@@ -440,28 +440,24 @@ class Request implements Routeable, Capturable
 	{
 		$uri = $request->uri;
 		$file = '';
-
-		if ($request->matches('#^\/' . PLAT_ROOT_URI . '\/resources\/(.*)#'))
-		{
-			$file = \Collei\Utils\Str::trimPrefix($uri, '/sites');
+		//
+		if (
+			$request->matches('#^\/' . PLAT_ROOT_URI . '\/resources\/(.*)#')
+		) {
+			$file = \Collei\Utils\Str::trimPrefix($uri, ('/' . PLAT_ROOT_URI));
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $file));
-		}
-		elseif ($request->matches('#^\/' . PLAT_ROOT_URI . '\/([^\/]+)\/resources\/(.*)#'))
-		{
+		} elseif (
+			$request->matches('#^\/' . PLAT_ROOT_URI . '\/([^\/]+)\/resources\/(.*)#')
+		) {
 			$file = str_replace('/', DIRECTORY_SEPARATOR, $uri);
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $uri));
 		}
-
-		if (file_exists($file))
-		{
-			$resp = \Collei\Http\DataResponse::make(
+		//
+		if (file_exists($file)) {
+			($resp = \Collei\Http\DataResponse::make(
 				$request->mimeFromFileName($file)
-			);
-
-			$resp
-				->setBody(file_get_contents($file))
-				->output();
-
+			))->setBody(file_get_contents($file))->output();
+			//
 			exit(0);
 		}
 	}
