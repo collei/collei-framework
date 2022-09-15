@@ -1,5 +1,5 @@
 <?php 
-namespace Collei\Performers\Injectors;
+namespace Collei\App\Performers\Injectors;
 
 use Collei\Exceptions\ColleiClassException;
 use ReflectionClass;
@@ -15,7 +15,7 @@ class DependencyInjector
 	/**
 	 *  bound class instantiators and constructors
 	 */
-	private const BOUND = [];
+	private static $BOUND = [];
 
 	/**
 	 *	@var array $reflector
@@ -55,14 +55,14 @@ class DependencyInjector
 	 *	Initializes the needed reflector engines for the work
 	 *
 	 *	@throws	\Exception
-	 *	@param	mixed	$classOrInstance
+	 *	@param	string|object	$classOrInstance
 	 *	@param	string	$method = null
 	 *	@return	null	 
 	 */
 	private function initReflect($classOrInstance, string $method = null)
 	{
 		if (
-			$this->called['constructor'] = is_string($classOrInstance)
+			$this->called['constructor'] = is_null($method) && is_string($classOrInstance)
 		) {
 			$this->called['instance'] = null;
 			$this->called['class'] = $classOrInstance;
@@ -72,6 +72,16 @@ class DependencyInjector
 			);
 			$this->reflector['function'] = (
 				$reflFunc = $reflClass->getConstructor()
+			);
+		} elseif (is_string($classOrInstance)) {
+			$this->called['instance'] = null;
+			$this->called['class'] = $classOrInstance;
+			$this->called['method'] = $method;
+			$this->reflector['class'] = (
+				$reflClass = new ReflectionClass($classOrInstance)
+			);
+			$this->reflector['function'] = (
+				$reflFunc = $reflClass->getMethod($method)
 			);
 		} else {
 			$this->called['instance'] = $classOrInstance;
@@ -97,7 +107,7 @@ class DependencyInjector
 	 */
 	protected static function boundInfo(string $type)
 	{
-		return self::BOUND[$type] ?? false;	
+		return self::$BOUND[$type] ?? false;	
 	}
 
 	/**
@@ -113,12 +123,17 @@ class DependencyInjector
 	protected static function staticOrNew($type)
 	{
 		if ($bound = self::boundInfo($type)) {
-			if ($bound['static']) {
+			if ($bound['method'] == '__construct') {
 				return new $type();
 			}
 			//
-			$staticMethod = $type . '::' . $bound['method'];
-			return call_user_func_array($staticMethod, []);
+			if ($bound['static']) {
+				$staticMethod = $type . '::' . $bound['method'];
+				//
+				return $staticMethod();
+			}
+			//
+			return false;
 		}
 		//
 		return false;
@@ -147,6 +162,17 @@ class DependencyInjector
 	}
 
 	/**
+	 *	Returns an array of \ReflectionParameter which refer
+	 *	to the method parameters
+	 *
+	 *	@return	array[\ReflectionParameter]
+	 */
+	public function getParameterReflectors()
+	{
+		return $this->reflector['parameters'];
+	}
+
+	/**
 	 *	Register the given $class and its $method (if any).
 	 *	Setting $method to null == '__construct'.
 	 *
@@ -161,8 +187,12 @@ class DependencyInjector
 		string $method = null,
 		bool $static = false
 	) {
-		self::BOUND[$class] = [
-			'method' => $method ?? '__construct',
+		if (empty($method)) {
+			$method = '__construct';
+		}
+		//
+		self::$BOUND[$class] = [
+			'method' => $method,
 			'static' => $static
 		];
 	}
@@ -181,7 +211,7 @@ class DependencyInjector
 		string $method = null,
 		bool $static = false
 	) {
-		self::bindClass($class, $constructorOrMethod, $static);
+		self::bindClass($class, $method, $static);
 		//
 		return $this;
 	}
@@ -222,7 +252,20 @@ class DependencyInjector
 			//
 			$paramType = is_null($paramType) ? '' : $paramType->getName();
 			//
-			if (array_key_exists($paramName, $this->values)) {
+			if (array_key_exists($paramType, $this->values)) {
+				$value = $this->values[$paramType];
+				//
+				if (is_a($value, $paramType)) {
+					$this->parameters[] = $value;
+				} else {
+					$typeName = gettype($value);
+					//
+					throw new ColleiClassException(
+						"Method $methodName, argument $paramName: "
+						. "expected $paramType but found $typeName instead..."
+					);
+				}
+			} elseif (array_key_exists($paramName, $this->values)) {
 				$value = $this->values[$paramName];
 				//
 				if (is_a($value, $paramType)) {
@@ -236,6 +279,8 @@ class DependencyInjector
 					);
 				}
 			} elseif ($bound = self::boundInfo($paramType)) {
+				$this->parameters[] = self::staticOrNew($paramType);
+			} elseif (class_exists($paramType)) {
 				$this->parameters[] = self::staticOrNew($paramType);
 			} elseif ($reParam->isOptional()) {
 				$this->parameters[] = $reParam->getDefaultValue();
@@ -271,14 +316,14 @@ class DependencyInjector
 			);
 		}
 		//
-		if ($this->reflector['method']->isStatic()) {
-			return $this->reflector['method']->invokeArgs(
+		if ($this->reflector['function']->isStatic()) {
+			return $this->reflector['function']->invokeArgs(
 				null,
 				$this->parameters
 			);
 		}
 		//
-		return $this->reflector['method']->invokeArgs(
+		return $this->reflector['function']->invokeArgs(
 			$this->called['instance'],
 			$this->parameters
 		);

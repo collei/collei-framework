@@ -10,9 +10,11 @@ use Collei\Services\Service;
 use Collei\Http\Uploaders\FileUploadRequest;
 use Collei\Pacts\Capturable;
 use Collei\Pacts\Makeable;
+use Collei\App\Performers\Injectors\DependencyInjector;
 use Persisto\Model\Model;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionUnionType;
 use Collei\Exceptions\InsuficientArgumentCountException;
 use InvalidArgumentException;
 use stdClass;
@@ -43,31 +45,21 @@ abstract class HttpServlet extends Servlet
 	 */
 	private function prepareResponse($content)
 	{
-		if ($content instanceof Response)
-		{
+		if ($content instanceof Response) {
 			return $content;
-		}
-		elseif ($content instanceof Model)
-		{
+		} elseif ($content instanceof Model) {
 			return $content;
-		}
-		elseif ($content instanceof View)
-		{
+		} elseif ($content instanceof View) {
 			return $content;
-		}
-		else
-		{
+		} else {
 			$response = Response::make();
-
-			if (is_array($content) || is_object($content))
-			{
+			//
+			if (is_array($content) || is_object($content)) {
 				$response->setBody(json_encode($content));
-			}
-			else
-			{
+			} else {
 				$response->setBody($content);
 			}
-
+			//
 			return $response;
 		}
 	}
@@ -151,8 +143,56 @@ abstract class HttpServlet extends Servlet
 	public static function assignRequestTo(HttpServlet $servlet, Request $request)
 	{
 		$servlet->request = $request;
-
+		//
 		return $servlet;
+	}
+
+	private static function makeServlet(Request $request)
+	{
+		$calledClass = get_called_class();
+		$injector = (new DependencyInjector($calledClass))
+			->bind(FileUploadRequest::class, 'capture', true)
+			->bind(Service::class, 'make', true)
+			->bind($calledClass, 'make', true)
+			->addValue(get_class($request), $request);
+		//
+		$refParams = $injector->getParameterReflectors();
+		foreach ($refParams as $refParam) {
+			$typeDef = $refParam->getType();
+			//
+			if ($typeDef instanceof ReflectionUnionType) {
+				foreach ($typeDef->getTypes() as $subType) {
+					if (class_exists($subType)) {
+						if (is_a($subType, Service::class, true)) {
+							$injector->bind($subType, 'make', true);
+						} elseif (is_a($subType, Request::class, true)) {
+							$injector->bind($subType, 'capture', true);
+						} else {
+							$injector->bind($subType);
+						}
+					}
+				}
+			} else {
+				$typeStr = (string)$typeDef;
+				if (class_exists($typeStr)) {
+					if (is_a($typeStr, Service::class, true)) {
+						$injector->bind($typeStr, 'make', true);
+					} elseif (is_a($typeStr, Request::class, true)) {
+						$injector->bind($typeStr, 'capture', true);
+					} else {
+						$injector->bind($typeStr);
+					}
+				}
+			}
+		}
+		//
+		foreach ($request->getParameterNames() as $name) {
+			$injector->addValue(
+				$name, $request->getParameter($name)
+			);
+		}
+		//
+		return $injector->call();
 	}
 
 	/**
@@ -163,12 +203,11 @@ abstract class HttpServlet extends Servlet
 	 *	@param	\Collei\Http\Request		$request
 	 *	@return	\Collei\Http\HttpServlet
 	 */
-	private static function makeServlet(Request $request)
+	private static function makeServlet2(Request $request)
 	{
 		$ref_class = new ReflectionClass(get_called_class());
 		$ref_construct = $ref_class->getConstructor();
 		$ref_params = $ref_construct->getParameters();
-
 		// basic types and default values
 		$atomic = [
 			'array' => [],
@@ -178,12 +217,10 @@ abstract class HttpServlet extends Servlet
 			'int' => 0,
 			'string' => '',
 		];
-
 		// housing parameters here
 		$parameters = [];
-
-		foreach ($ref_params as $ref_parm)
-		{
+		//
+		foreach ($ref_params as $ref_parm) {
 			$name = $ref_parm->getName();
 			$type = $ref_parm->getType();
 
@@ -252,7 +289,7 @@ abstract class HttpServlet extends Servlet
 				);
 			}
 		}
-
+		//
 		return $ref_class->newInstance(...$parameters);
 	}
 
@@ -265,15 +302,13 @@ abstract class HttpServlet extends Servlet
 	public static function make()
 	{
 		$args = func_get_args();
-
-		if (isset($args[0]))
-		{
-			if (is_a($args[0], Request::class, true))
-			{
+		//
+		if (isset($args[0])) {
+			if (is_a($args[0], Request::class, true)) {
 				return static::makeServlet($args[0]);
 			}
 		}
-
+		//
 		return static::makeServlet(Request::capture());
 	}
 

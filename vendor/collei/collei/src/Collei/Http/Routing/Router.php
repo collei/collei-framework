@@ -40,11 +40,10 @@ class Router
 	 */
 	private static function getActiveGroup()
 	{
-		if (static::$groupLevel >= 0)
-		{
+		if (static::$groupLevel >= 0) {
 			return static::$groupLevels[static::$groupLevel];
 		}
-
+		//
 		return false;
 	}
 
@@ -58,10 +57,8 @@ class Router
 	 */
 	private static function setInActiveGroup(string $term, $value)
 	{
-		if (!in_array($term, ['prefix','name','controller']))
-		{
-			if (static::$groupLevel >= 0)
-			{
+		if (!in_array($term, ['prefix','name','controller'])) {
+			if (static::$groupLevel >= 0) {
 				static::$groupLevels[static::$groupLevel][$term] = $value;
 			}
 		}
@@ -77,26 +74,22 @@ class Router
 	 */
 	private static function getAccumulated(string $term)
 	{
-		if (!in_array($term, ['prefix','name','controller']))
-		{
+		if (!in_array($term, ['prefix','name','controller'])) {
 			return false;
 		}
-
-		if (static::$groupLevel >= 0)
-		{
+		//
+		if (static::$groupLevel >= 0) {
 			$termLevels = [];
-
-			foreach (static::$groupLevels as $level)
-			{
-				if (isset($level[$term]))
-				{
+			//
+			foreach (static::$groupLevels as $level) {
+				if (isset($level[$term])) {
 					$termLevels[] = $level[$term];
 				}
 			}
-
+			//
 			return $termLevels;
 		}
-
+		//
 		return false;
 	}
 
@@ -108,11 +101,10 @@ class Router
 	 */
 	private static function getAccumulatedPath()
 	{
-		if ($pathLevels = static::getAccumulated('prefix'))
-		{
+		if ($pathLevels = static::getAccumulated('prefix')) {
 			return Arr::joinCollapsed('/', $pathLevels);
 		}
-
+		//
 		return false;
 	}
 
@@ -124,11 +116,10 @@ class Router
 	 */
 	private static function getAccumulatedName()
 	{
-		if ($pathLevels = static::getAccumulated('name'))
-		{
+		if ($pathLevels = static::getAccumulated('name')) {
 			return Arr::joinCollapsed('', $pathLevels);
 		}
-
+		//
 		return false;
 	}
 
@@ -140,11 +131,10 @@ class Router
 	 */
 	private static function getGroupController()
 	{
-		if ($pathLevels = static::getAccumulated('controller'))
-		{
+		if ($pathLevels = static::getAccumulated('controller')) {
 			return array_pop($pathLevels) ?? false;
 		}
-
+		//
 		return false;
 	}
 
@@ -335,8 +325,7 @@ class Router
 	) {
 		$appName = self::fetchBaseAppCaller();
 		//
-		if ($attr = self::getActiveGroup())
-		{
+		if ($attr = self::getActiveGroup()) {
 			if (($o_path = self::getAccumulatedPath())) {
 				$o_path .= '/' . Str::trimPrefix($path, '/');
 			} else {
@@ -354,16 +343,24 @@ class Router
 				$o_controller = $servletClass;
 			}
 			//
+			$routeDescription = '('
+				. (is_array($routeMethod) ? implode(',', $routeMethod) : $routeMethod)
+				. ")({$o_controller}::{$o_method})";
+			//
 			logit(__METHOD__, print_r([
-				'route' => "({$routeMethod})({$o_controller}.{$o_method})",
+				'route' => $routeDescription,
 				'path' => $path,
 				'cold' => $o_path,
 			], true));
 			//
-			return RouteResolver::makeRoute($routeMethod, $o_path, $o_controller, $o_method, $appName);
+			return RouteResolver::makeRoute(
+				$routeMethod, $o_path, $o_controller, $o_method, $appName
+			);
 		}
 		//
-		return RouteResolver::makeRoute($routeMethod, $path, $servletClass, $servletMethod, $appName);
+		return RouteResolver::makeRoute(
+			$routeMethod, $path, $servletClass, $servletMethod, $appName
+		);
 	}
 
 

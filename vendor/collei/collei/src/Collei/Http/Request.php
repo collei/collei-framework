@@ -348,6 +348,15 @@ class Request implements Routeable, Capturable
 		return null;
 	}
 
+	public function getParameterNames()
+	{
+		return array_merge(
+			$this->attributes->names(),
+			$this->form->names(),
+			$this->query->names()
+		);
+	}
+
 	/**
 	 *	Ask for parameter existence
 	 *
