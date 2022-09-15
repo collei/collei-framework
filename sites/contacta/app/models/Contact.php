@@ -17,8 +17,7 @@ class Contact extends Model
 
 	public function meanList()
 	{
-		if (empty($this->mean_list))
-		{
+		if (empty($this->mean_list)) {
 			$this->mean_list = $this->hasMany(Mean::class);
 		}
 		//
@@ -29,7 +28,7 @@ class Contact extends Model
 	{
 		return $this->avatar
 			?? $alternative
-			?? 'http://des.php.local/plat/resources/images/noimage.jpg';
+			?? 'http://kazuha.local/resources/images/noimage.jpg';
 	}
 
 }

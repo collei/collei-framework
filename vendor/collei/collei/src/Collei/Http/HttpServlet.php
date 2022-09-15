@@ -140,13 +140,43 @@ abstract class HttpServlet extends Servlet
 	 *	@param	\Collei\Http\Request		$request
 	 *	@return	\Collei\Http\HttpServlet
 	 */
-	public static function assignRequestTo(HttpServlet $servlet, Request $request)
-	{
+	public static function assignRequestTo(
+		HttpServlet $servlet, Request $request
+	) {
 		$servlet->request = $request;
 		//
 		return $servlet;
 	}
 
+	/**
+	 *	Helper for makeServlet() method. Binds additional classes needed
+	 *	for the constructor parameters.
+	 *
+	 *	@param	string	$type
+	 *	@param	Collei\App\Performers\Injectors\DependencyInjector	$injector
+	 *	@return	void
+	 */
+	private static function bindTypeInto(
+		string $type, DependencyInjector $injector
+	) {
+		if (class_exists($type)) {
+			if (is_a($type, Service::class, true)) {
+				$injector->bind($type, 'make', true);
+			} elseif (is_a($type, Request::class, true)) {
+				$injector->bind($type, 'capture', true);
+			} else {
+				$injector->bind($type);
+			}
+		}
+	}
+
+	/**
+	 *	Creates a new HttpServlet instance (or subclass of it)
+	 *	with injected instances of arguments, if any
+	 *
+	 *	@param	\Collei\Http\Request		$request
+	 *	@return	\Collei\Http\HttpServlet
+	 */
 	private static function makeServlet(Request $request)
 	{
 		$calledClass = get_called_class();
@@ -162,27 +192,12 @@ abstract class HttpServlet extends Servlet
 			//
 			if ($typeDef instanceof ReflectionUnionType) {
 				foreach ($typeDef->getTypes() as $subType) {
-					if (class_exists($subType)) {
-						if (is_a($subType, Service::class, true)) {
-							$injector->bind($subType, 'make', true);
-						} elseif (is_a($subType, Request::class, true)) {
-							$injector->bind($subType, 'capture', true);
-						} else {
-							$injector->bind($subType);
-						}
-					}
+					self::bindTypeInto($subType, $injector);
 				}
 			} else {
-				$typeStr = (string)$typeDef;
-				if (class_exists($typeStr)) {
-					if (is_a($typeStr, Service::class, true)) {
-						$injector->bind($typeStr, 'make', true);
-					} elseif (is_a($typeStr, Request::class, true)) {
-						$injector->bind($typeStr, 'capture', true);
-					} else {
-						$injector->bind($typeStr);
-					}
-				}
+				self::bindTypeInto(
+					(string)$typeDef, $injector
+				);
 			}
 		}
 		//
@@ -193,104 +208,6 @@ abstract class HttpServlet extends Servlet
 		}
 		//
 		return $injector->call();
-	}
-
-	/**
-	 *	Creates a new HttpServlet instance (or subclass of it)
-	 *	with injected instances of arguments, if any
-	 *
-	 *	@param	\Collei\Http\HttpServlet	$request
-	 *	@param	\Collei\Http\Request		$request
-	 *	@return	\Collei\Http\HttpServlet
-	 */
-	private static function makeServlet2(Request $request)
-	{
-		$ref_class = new ReflectionClass(get_called_class());
-		$ref_construct = $ref_class->getConstructor();
-		$ref_params = $ref_construct->getParameters();
-		// basic types and default values
-		$atomic = [
-			'array' => [],
-			'callable' => (function(...$params){ return false; }),
-			'bool' => false,
-			'float' => 0.0,
-			'int' => 0,
-			'string' => '',
-		];
-		// housing parameters here
-		$parameters = [];
-		//
-		foreach ($ref_params as $ref_parm) {
-			$name = $ref_parm->getName();
-			$type = $ref_parm->getType();
-
-			if (!is_null($type))
-			{
-				$type = $type->getName();
-			}
-			else
-			{
-				$type = '';
-			}
-
-			if ($type === Request::class)
-			{
-				$parameters[] = $request;
-			}
-			elseif (is_subclass_of($type, Request::class))
-			{
-				if ($type === FileUploadRequest::class)
-				{
-					if ($request instanceof FileUploadRequest)
-					{
-						$parameters[] = $request;
-					}
-					else
-					{
-						$parameters[] = FileUploadRequest::capture();
-					}
-				}
-				else
-				{
-					$parameters[] = $type::capture();
-				}
-			}
-			elseif (is_subclass_of($type, Service::class))
-			{
-				$parameters[] = $type::make();
-			}
-			elseif (is_a($type, Capturable::class, true))
-			{
-				$parameters[] = $type::capture();
-			}
-			elseif (is_a($type, Makeable::class, true))
-			{
-				$parameters[] = $type::make();
-			}
-			elseif ($request->hasParameter($name))
-			{
-				$parameters[] = $request->getParameter($name);
-			}
-			elseif ($ref_parm->isOptional())
-			{
-				$parameters[] = $ref_parm->getDefaultValue();
-			}
-			elseif (array_key_exists($type, $atomic))
-			{
-				$parameters[] = $atomic[$type];
-			}
-			else
-			{
-				$parameters[] = null;
-				//
-				logerror(
-					'Servlet method: mandatory not present',
-					"Missing argument $name of type $type not present in the request "
-				);
-			}
-		}
-		//
-		return $ref_class->newInstance(...$parameters);
 	}
 
 	/**
