@@ -347,11 +347,13 @@ class Router
 				. (is_array($routeMethod) ? implode(',', $routeMethod) : $routeMethod)
 				. ")({$o_controller}::{$o_method})";
 			//
+			/*
 			logit(__METHOD__, print_r([
 				'route' => $routeDescription,
 				'path' => $path,
 				'cold' => $o_path,
 			], true));
+			*/
 			//
 			return RouteResolver::makeRoute(
 				$routeMethod, $o_path, $o_controller, $o_method, $appName

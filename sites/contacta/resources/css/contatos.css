@@ -10,9 +10,11 @@
 .mona,
 .barbara,
 .tartaglia,
-.kokomi,
 .kamisato-ayato,
-.yelan
+.sangonomiya-kokomi,
+.yelan,
+.candace,
+.nilou
 	{ color: #02F; }
 /* Pyro */
 .yanfei,
@@ -22,7 +24,9 @@
 .klee,
 .bennett,
 .xiangling,
-.thoma
+.thoma,
+.dehya,
+.xinyan
 	{ color: #F00; }
 /* Geo */
 .zhongli,
@@ -54,7 +58,9 @@
 .razor,
 .lisa,
 .kujou-sara,
-.kuki-shinobu
+.kuki-shinobu,
+.dori,
+.cyno
 	{ color: #B0B; }
 /* Anemo */
 .venti,
@@ -68,7 +74,10 @@
 /* Dendro */
 .baizhu,
 .collei,
-.kusanali
+.tighnari,
+.kusanali,
+.yaoyao,
+.al-haitham
 	{ color: #3B0; }
 
 div.tagpills-edit

@@ -153,7 +153,7 @@ abstract class HttpServlet extends Servlet
 	 *	for the constructor parameters.
 	 *
 	 *	@param	string	$type
-	 *	@param	Collei\App\Performers\Injectors\DependencyInjector	$injector
+	 *	@param	\Collei\App\Performers\Injectors\DependencyInjector	$injector
 	 *	@return	void
 	 */
 	private static function bindTypeInto(

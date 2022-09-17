@@ -30,18 +30,15 @@ class FilterChain
 	private static function requireFilter(string $filterClass)
 	{
 		$app_site = App::getInstance()->getSite();
-
-		if (!is_null($app_site) && $app_site!='')
-		{
+		//
+		if (!is_null($app_site) && $app_site!='') {
 			require_site_class($app_site, $filterClass);
 			return true;
-		}
-		else
-		{
+		} else {
 			require_manager_class($filterClass);
 			return true;
 		}
-
+		//
 		return false;
 	}
 

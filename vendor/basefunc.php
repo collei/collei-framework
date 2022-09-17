@@ -7,7 +7,7 @@ define('PLAT_GROUND', dirname(__FILE__, 2));
 define('DIR_SEP', DIRECTORY_SEPARATOR);
 
 define('PLAT_LOGGING', [
-	'classloader' => true,
+	'classloader' => false,
 ]);
 
 define('PLAT_APP_FOLDER_NAME', 'app');

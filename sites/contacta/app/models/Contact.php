@@ -28,7 +28,7 @@ class Contact extends Model
 	{
 		return $this->avatar
 			?? $alternative
-			?? 'http://kazuha.local/resources/images/noimage.jpg';
+			?? 'http://kazuha.local/sites/resources/images/noimage.jpg';
 	}
 
 }

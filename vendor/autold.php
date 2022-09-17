@@ -66,22 +66,32 @@ function init_plugin_manager()
  */
 function autold_logger($title, $message, $severity = null)
 {
+	static $timesCalled = 0;
 	// obeys logging control flag
-	if (!(PLAT_LOGGING['classloader'] ?? true))
-	{
+	if (!(PLAT_LOGGING['classloader'] ?? true)) {
 		return;
 	}
 	//
+	$file = PLAT_LOGS_GROUND
+		. DIRECTORY_SEPARATOR
+		. '.plat-autold-' . date('Ymd') . '.log';
+	//
+	if ($timesCalled == 0) {
+		$line = "\r\n\r\n-------------------[ start of log at "
+			. (new \DateTime())->format('Y-m-d H:i:s.u')
+			. ' ]--------------------';
+		//
+		file_put_contents($file, $line, FILE_APPEND);
+	}
+	//
+	++$timesCalled;
+	//
 	$line = "\r\n"
-		. date_format(date_create(), 'Y-m-d H:i:s.u')
+		. (new \DateTime())->format('Y-m-d H:i:s.u')
 		. ($severity ?? 'common_log')
 		. ($title . ' -> ' . $message);
 	//
-	file_put_contents(
-		PLAT_LOGS_GROUND . DIRECTORY_SEPARATOR . '.plat-autold-' . date('Ymd') . '.log',
-		$line,
-		FILE_APPEND
-	);
+	file_put_contents( $file, $line, FILE_APPEND);
 }
 
 /**

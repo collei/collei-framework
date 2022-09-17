@@ -227,8 +227,6 @@ class App
 		if ($this->hasRouteFor($this->url->path)) {
 			$this->assignRoute();
 		}
-
-		logit('NO_ROUTE', "No route\r\n\t\tfor {$this->request->uri}");
 	}
 
 	/**

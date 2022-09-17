@@ -9,6 +9,8 @@ use Collei\Auth\AuthConfirmator;
 
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
 use Sonata\GoogleAuthenticator\GoogleQrUrl;
+use DateTimeImmutable;
+use DateTimeInterface;
 
 /**
  *	This allow reuse of code and funcionality injection.
@@ -33,13 +35,20 @@ class GoogleAuthService extends Service implements AuthConfirmator
 	private $goo = null;
 
 	/**
+	 *	@var	\DateTimeInterface
+	 */
+	private $timeCreated = null;
+
+	/**
 	 *	Initializer
 	 *
 	 *	@return self
 	 */
 	public function __construct()
 	{
-		$this->goo = new GoogleAuthenticator();
+		$this->timeCreated = new DateTimeImmutable();
+		//
+		$this->goo = new GoogleAuthenticator(6, 10, $this->timeCreated, 300);
 	}
 
 	/**
@@ -73,7 +82,7 @@ class GoogleAuthService extends Service implements AuthConfirmator
 	public function generateQrCodeURL(string $userName)
 	{
 		$this->secret = $this->goo->generateSecret();
-
+		//
 		return $this->qr = GoogleQrUrl::generate(
 			$userName, $this->secret, PLAT_NAME, 300
 		);
@@ -90,7 +99,7 @@ class GoogleAuthService extends Service implements AuthConfirmator
 	 */
 	public function verify(string $secret, string $code)
 	{
-		return $this->goo->checkCode($secret, $code);
+		return $this->goo->checkCode($secret, $code, 5);
 	}
 
 }

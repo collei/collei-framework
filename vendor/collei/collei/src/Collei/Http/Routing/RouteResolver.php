@@ -186,13 +186,13 @@ class RouteResolver
 		//
 		// if strictly equals, no parameters found
 		if ($str_route === $str_uri) {
-			logit('::route.found.verbatim', $uri);
+			//logit('::route.found.verbatim', $uri);
 			return true;
 		}
 		//
 		// if equals, ignoring the trailing / at request uri
 		if ($str_route === substr($str_uri,0,-1)) {
-			logit('::route.found', $uri);
+			//logit('::route.found', $uri);
 			return true;
 		}
 		//

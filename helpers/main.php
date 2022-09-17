@@ -106,7 +106,7 @@ if (!function_exists('route'))
 	{
 		$route = RouteResolver::resolveByName($name);
 
-		logit("helper:route('$name')", print_r($route,true));
+		//logit("helper:route('$name')", print_r($route,true));
 
 		//
 		if (is_array($arguments)) {
