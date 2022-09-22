@@ -12,8 +12,22 @@ or higher.
 RewriteEngine on
 RewriteCond %{REQUEST_URI} !-f 
 RewriteCond %{REQUEST_URI} !-d
-RewriteRule ^sites(.*)$ /plat/public/index.php [L]
+RewriteRule ^sites(.*)$ /collei-framework/public/index.php [L]
 ```
+
+### Note on IIS Systems
+Just discovered how to run Collei framework under IIS! You must add these
+lines to your <Rewrite> section of your Web.config:
+```
+<rules>
+	<rule name="Collei Framework Sites">
+		<match url="^sites/(.*)" />
+		<action type="Rewrite" url="/collei-framework/public/index.php" />
+	</rule>
+</rules>
+```
+Updating the file should work immediately. If it doesn't, just restart the IIS
+server.
 
 ## Build Status
 Developed currently under Apache Web Server 2.4, PHP 8.0.21, Windows 10.

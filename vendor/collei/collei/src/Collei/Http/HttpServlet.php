@@ -195,9 +195,7 @@ abstract class HttpServlet extends Servlet
 					self::bindTypeInto($subType, $injector);
 				}
 			} else {
-				self::bindTypeInto(
-					(string)$typeDef, $injector
-				);
+				self::bindTypeInto((string)$typeDef, $injector);
 			}
 		}
 		//

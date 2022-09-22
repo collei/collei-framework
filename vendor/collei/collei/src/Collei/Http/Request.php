@@ -348,6 +348,11 @@ class Request implements Routeable, Capturable
 		return null;
 	}
 
+	/**
+	 *	Get the names of all available parameters. 
+	 *
+	 *	@return	array
+	 */
 	public function getParameterNames()
 	{
 		return array_merge(
@@ -390,8 +395,7 @@ class Request implements Routeable, Capturable
 	 */
 	public function cookie(string $item)
 	{
-		if ($this->cookies->has($item))
-		{
+		if ($this->cookies->has($item)) {
 			return $this->cookies->get($item);
 		}
 		return '';
@@ -405,8 +409,9 @@ class Request implements Routeable, Capturable
 	 */
 	public function bindRoute(Route $route)
 	{
-		$this->route = $route;
-		$this->inferRouteParameters();
+		if ($this->route = $route) {
+			$this->inferRouteParameters();
+		}
 	}
 
 	/**
@@ -429,11 +434,10 @@ class Request implements Routeable, Capturable
 	 */
 	public function matches(string $pattern, array &$matches = null)
 	{
-		if (is_null($matches))
-		{
+		if (is_null($matches)) {
 			return preg_match($pattern, $this->uri) === 1;
 		}
-
+		//
 		return preg_match($pattern, $this->uri, $matches) === 1;
 	}
 
@@ -449,15 +453,15 @@ class Request implements Routeable, Capturable
 	{
 		$uri = $request->uri;
 		$file = '';
+		$pattern = [
+			1 => ('#^\/' . PLAT_ROOT_URI . '\/resources\/(.*)#'),
+			2 => ('#^\/' . PLAT_ROOT_URI . '\/([^\/]+)\/resources\/(.*)#')
+		];
 		//
-		if (
-			$request->matches('#^\/' . PLAT_ROOT_URI . '\/resources\/(.*)#')
-		) {
+		if ($request->matches($pattern[1])) {
 			$file = \Collei\Utils\Str::trimPrefix($uri, ('/' . PLAT_ROOT_URI));
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $file));
-		} elseif (
-			$request->matches('#^\/' . PLAT_ROOT_URI . '\/([^\/]+)\/resources\/(.*)#')
-		) {
+		} elseif ($request->matches($pattern[2])) {
 			$file = str_replace('/', DIRECTORY_SEPARATOR, $uri);
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $uri));
 		}
