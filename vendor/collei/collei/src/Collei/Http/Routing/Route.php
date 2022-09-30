@@ -130,7 +130,12 @@ class Route
 	 */
 	private function appendRootFolder(string $path)
 	{
-		return App::getInstance()->getRootFolderAppended($path);
+		$result = PLAT_ROOT
+			. App::getInstance()->getRootFolderAppended($path);
+		//
+		//logit('eiir: ' . __METHOD__, print_r([$path, $result], true));
+		//
+		return $result;
 	}
 
 	/**

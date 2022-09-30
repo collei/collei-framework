@@ -42,6 +42,7 @@ other contributors.
 * Basic authentication structure with support for Google Authentication
 
 ### For the Long Run
+* LDAP-based automatic logon
 * Site Admin Center for site creation, class file management, database profile
 management, and so on
 * Support for Windows Authentication, Microsoft MFA, and possibly custom auth

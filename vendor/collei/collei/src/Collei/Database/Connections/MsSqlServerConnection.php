@@ -4,6 +4,7 @@ namespace Collei\Database\Connections;
 use Collei\Database\Box\QueryBox;
 use Collei\Database\Query\DatabaseQueryException;
 use Collei\Database\Query\Dialects\SqlServerDialect;
+use Collei\Database\DatabaseException;
 use Collei\Utils\Arr;
 use Collei\Utils\Parsers\DsnParser;
 use Closure;
@@ -81,7 +82,7 @@ class MsSqlServerConnection extends Connection
 	protected function processError(Exception $ex, string $query, string $whereItOccurred, array $data = null)
 	{
 		$errors = \sqlsrv_errors(SQLSRV_ERR_ALL);
-
+		//
 		$info = print_r([
 			'sqlsrv_errors' => $errors,
 			'sql' => $query,
@@ -90,9 +91,12 @@ class MsSqlServerConnection extends Connection
 			'code' => $ex->getCode(),
 			'message' => $ex->getMessage()
 		], true);
-
-		logerror('DBCE: ' . get_class($this), $whereItOccurred . ': ' . $info . ', ' . print_r($info, true));
-
+		//
+		logerror(
+			'DBCE: ' . get_class($this),
+			$whereItOccurred . ': ' . $info . ', ' . print_r($info, true)
+		);
+		//
 		$this->addError(get_class($ex), $ex->getCode(), $ex->getMessage());		
 		$this->addError('PDO', -1, 'ST: ' . print_r($info, true));
 	}
@@ -111,21 +115,18 @@ class MsSqlServerConnection extends Connection
 	{
 		$values = [];
 		$defaults = [];
-
-		if (!empty($user))
-		{
+		//
+		if (!empty($user)) {
 			$defaults['user'] = $user;
 		}
-
-		if (!empty($pass))
-		{
+		//
+		if (!empty($pass)) {
 			$defaults['password'] = $pass;
 		}
-
+		//
 		$defaults['charset'] = $options['charset'] ?? 'UTF-8';
-
-		if (DsnParser::parsePdoSqlServer($dsn, $values, $defaults))
-		{
+		//
+		if (DsnParser::parsePdoSqlServer($dsn, $values, $defaults)) {
 			$options = [
 				'UID' => $values['uid'],
 				'PWD' => $values['pwd'],
@@ -134,25 +135,22 @@ class MsSqlServerConnection extends Connection
 				'CharacterSet' => 'UTF-8',
 				'TrustServerCertificate' => 'true',
 			];
-
+			//
 			//logit(__METHOD__, print_r([$values, $options], true));
-
+			//
 			$this->handle = \sqlsrv_connect($values['server'], $options);
-
+			//
 			$errors = \sqlsrv_errors(SQLSRV_ERR_ERRORS);
-
-			if (!empty($errors))
-			{
+			//
+			if (!empty($errors)) {
 				throw new RuntimeException('mysqli connection error: ' . $errors[0]['code'] . ': ' . $errors[0]['message']);
 			}
-
+			//
 			$this->is_open = true;
-		}
-		else
-		{
+		} else {
 			$this->is_open = false;
 			$this->addError('malformed DSN', -1, $dsn);
-
+			//
 			throw new InvalidArgumentException('DSN is invalid or malformed.');	
 		}
 	}
@@ -178,18 +176,16 @@ class MsSqlServerConnection extends Connection
 	 */
 	protected function binder($stmt, $data, $callerInfo = null)
 	{
-		if (count($data) > 0)
-		{
+		if (count($data) > 0) {
 			$types = '';
 			$rowdata = [];
-
-			foreach ($data as $n => $v)
-			{
+			//
+			foreach ($data as $n => $v) {
 				$type = (is_double($v) ? 'd' : (is_int($v) ? 'i' : 's'));
 				$types .= $type;
 				$rowdata[] = $v;
 			}
-
+			//
 			$stmt->bind_param($types, ...$rowdata);
 		}
 	}
@@ -206,34 +202,29 @@ class MsSqlServerConnection extends Connection
 		$result = [];
 		$rsrc = \sqlsrv_query($this->handle, $sql, $params);
 		$errors = \sqlsrv_errors(SQLSRV_ERR_ERRORS);
-
+		//
 		//logit(__METHOD__, print_r([ 'sql' => $sql, 'params' => $params, 'handle' => $this->handle, 'rowset.type' => gettype($rsrc), 'conn' => $this->getName(), 'errs' => $errors ], true));
-
-		if (!empty($errors))
-		{
+		//
+		if (!empty($errors)) {
 			$ex = new RuntimeException('sqlsrv select error: ' . $errors[0]['code'] . ': ' . $errors[0]['message']);
-
+			//
 			$this->processError($ex, $sql, __METHOD__ . ' » sqlsrv_query(): ', $params);
 			throw $ex;
 		}
-
-		while ($row = \sqlsrv_fetch_array($rsrc, SQLSRV_FETCH_ASSOC))
-		{
+		//
+		while ($row = \sqlsrv_fetch_array($rsrc, SQLSRV_FETCH_ASSOC)) {
 			/*
-			foreach ($row as $ri => $cell)
-			{
-				if ($cell instanceof \DateTime)
-				{
+			foreach ($row as $ri => $cell) {
+				if ($cell instanceof \DateTime) {
 					$row[$ri] = $cell->format('Y-m-d H:i:s');
 				}
 			}
 			*/
-
 			$result[] = $row;
 		}
-
+		//
 		\sqlsrv_free_stmt($rsrc);
-
+		//
 		return $result;
 	}
 
@@ -250,32 +241,30 @@ class MsSqlServerConnection extends Connection
 	{
 		$last_id = 0;
 		$rows_affected = 0;
-
+		//
 		$params = Arr::values($row);
 		$rsrc = \sqlsrv_query($this->handle, $sql, $params);
-
+		//
 		//logit(__METHOD__, print_r([ 'sql' => $sql, 'params' => $params, 'handle' => $this->handle, 'rowset.type' => gettype($rsrc), 'conn' => $this->getName(), 'errs' => $errors ], true));
-
-		if ($rsrc !== false)
-		{
+		//
+		if ($rsrc !== false) {
 			//\sqlsrv_next_result($rsrc); 
 			\sqlsrv_fetch($rsrc); 			
 			$last_id = \sqlsrv_get_field($rsrc, 0);
 			$rows_affected = \sqlsrv_rows_affected($rsrc);
 		}
-
+		//
 		$errors = \sqlsrv_errors(SQLSRV_ERR_ERRORS);
-
+		//
 		\sqlsrv_free_stmt($rsrc);
-
-		if (!empty($errors))
-		{
+		//
+		if (!empty($errors)) {
 			$ex = new RuntimeException('mysqli insert_into error: ' . $errors[0]['code'] . ': ' . $errors[0]['message']);
-
+			//
 			$this->processError($ex, $sql, __METHOD__ . ' » sqlsrv_query(): ', [$row]);
 			throw $ex;
 		}
-
+		//
 		return $last_id;
 	}
 
@@ -292,30 +281,28 @@ class MsSqlServerConnection extends Connection
 	{
 		$last_id = 0;
 		$rows_affected = 0;
-
+		//
 		$params = Arr::values($data);
 		$rsrc = \sqlsrv_query($this->handle, $sql, $params);
-
-		if ($rsrc !== false)
-		{
+		//
+		if ($rsrc !== false) {
 			$last_id = \sqlsrv_get_field($rsrc, 0);
 			$rows_affected = \sqlsrv_rows_affected($rsrc);
 		}
-
+		//
 		$errors = \sqlsrv_errors(SQLSRV_ERR_ERRORS);
-
+		//
 		\sqlsrv_free_stmt($rsrc);
-
-		if (!empty($errors))
-		{
+		//
+		if (!empty($errors)) {
 			$ex = new RuntimeException('sqlsrv update error: ' . $errors[0]['code'] . ': ' . $errors[0]['message']);
-
+			//
 			$this->processError($ex, $sql, __METHOD__ . ' » sqlsrv_query(): ', [$data]);
 			throw $ex;
 		}
-
+		//
 		//logit($callerInfo.' from('.__METHOD__.') ', print_r([ 'stmt' => $stmt, 'data' => $data ], true));		
-
+		//
 		return $rows_affected;
 	}
 
@@ -331,28 +318,26 @@ class MsSqlServerConnection extends Connection
 	{
 		$last_id = 0;
 		$rows_affected = 0;
-
+		//
 		$params = Arr::values($data);
 		$rsrc = \sqlsrv_query($this->handle, $sql, $params);
-
-		if ($rsrc !== false)
-		{
+		//
+		if ($rsrc !== false) {
 			$last_id = \sqlsrv_get_field($rsrc, 0);
 			$rows_affected = \sqlsrv_rows_affected($rsrc);
 		}
-
+		//
 		$errors = \sqlsrv_errors(SQLSRV_ERR_ERRORS);
-
+		//
 		\sqlsrv_free_stmt($rsrc);
-
-		if (!empty($errors))
-		{
+		//
+		if (!empty($errors)) {
 			$ex = new RuntimeException('sqlsrv delete_from error: ' . $errors[0]['code'] . ': ' . $errors[0]['message']);
-
+			//
 			$this->processError($ex, $sql, __METHOD__ . ' » sqlsrv_query(): ', [$data]);
 			throw $ex;
 		}
-
+		//
 		return $rows_affected;
 	}
 
@@ -365,23 +350,20 @@ class MsSqlServerConnection extends Connection
 	protected function transactBunch(Closure $bunch)
 	{
 		$result = 0;
-
-		try
-		{
+		//
+		try {
 			\sqlsrv_begin_transaction($this->handle);
 			$result = $bunch();
 			\sqlsrv_commit($this->handle);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			\sqlsrv_commit($this->handle);
-
+			//
 			$ex = new DatabaseQueryException('There are errors during transaction inside transact($bunch).');
-
+			//
 			$this->processError($ex, $sql, __METHOD__ . ' » sqlsrv_query(): ', [$result]);
 			throw $ex;
 		}
-
+		//
 		return $result;
 	}
 
@@ -395,11 +377,15 @@ class MsSqlServerConnection extends Connection
 	 */
 	public function __construct($dsn, string $database = '', string $username = '', string $password = '')
 	{
+		if (!function_exists('sqlsrv_connect')) {
+			throw new DatabaseException('PHP extension not installed or not configured properly: sqlsvr.');
+		}
+		//
 		$this->conn_data['dsn'] = $dsn;
 		$this->conn_data['database'] = $database;
 		$this->conn_data['username'] = $username;
 		$this->conn_data['password'] = $password;
-
+		//
 		$this->dialect = new SqlServerDialect();
 	}
 
@@ -410,14 +396,12 @@ class MsSqlServerConnection extends Connection
 	 */
 	public function __destruct()
 	{
-		if (is_array($this->errors))
-		{
-			foreach ($this->errors as $error)
-			{
+		if (is_array($this->errors)) {
+			foreach ($this->errors as $error) {
 				logerror('DBCE: ' . get_class($this), print_r($error, true));
 			}
 		}
-
+		//
 		$this->is_open = false;
 		$this->conn_data = null;
 		$this->handle = null;
@@ -432,9 +416,8 @@ class MsSqlServerConnection extends Connection
 	public function changeDatabase(string $database)
 	{
 		parent::changeDatabase($database);
-
-		if ($this->is_open)
-		{
+		//
+		if ($this->is_open) {
 			\sqlsrv_query($this->handle, "USE $database;");
 		}
 	}
@@ -446,19 +429,16 @@ class MsSqlServerConnection extends Connection
 	 */
 	public function open()
 	{
-		try
-		{
+		try {
 			$this->openHandle(
 				$this->conn_data['dsn'],
 				$this->conn_data['username'],
 				$this->conn_data['password'],
 				$this->conn_data['options']
 			);
-
+			//
 			$this->changeDatabase($this->conn_data['database']);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$str = print_r($this->conn_data, true);
 			$this->processError($ex, $ex->getMessage(), __METHOD__ . ' » mysqli::connect(): ', [$this->conn_data, $str]);
 		}
@@ -483,17 +463,14 @@ class MsSqlServerConnection extends Connection
 	public function select(string $query, array $data = [])
 	{
 		$results = 0;
-
-		try
-		{
+		//
+		try {
 			$results = $this->selectQuery($query, $data);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->processError($ex, $query, __METHOD__);
 			return null;
 		}
-
+		//
 		return $results;
 	}
 
@@ -508,17 +485,14 @@ class MsSqlServerConnection extends Connection
 	public function insertOne(string $query, array $row, bool $useNamedParams = false)
 	{
 		$results = 0;
-
-		try
-		{
+		//
+		try {
 			$results = $this->insertQuery($query, $row, $useNamedParams);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->processError($ex, $query, __METHOD__);
 			return null;
 		}
-
+		//
 		return $results;
 	}
 
@@ -533,24 +507,20 @@ class MsSqlServerConnection extends Connection
 	public function insertMany(string $query, array $rows, bool $useNamedParams = false)
 	{
 		$results = 0;
-
-		try
-		{
+		//
+		try {
 			$results = $this->transactBunch(function() use ($query, $rows, $useNamedParams){
 				$list_ids = [];
-				foreach ($rows as $row)
-				{
+				foreach ($rows as $row) {
 					$list_ids[] = $this->insertQuery($query, $row, $useNamedParams);
 				}
 				return $list_ids;
 			});
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->processError($ex, $query, __METHOD__);
 			return null;
 		}
-
+		//
 		return $results;
 	}
 
@@ -565,17 +535,14 @@ class MsSqlServerConnection extends Connection
 	public function update(string $query, array $data, bool $useNamedParams = false)
 	{
 		$results = 0;
-
-		try
-		{
+		//
+		try {
 			$results = $this->updateQuery($query, $data, $useNamedParams);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->processError($ex, $query, __METHOD__ . ' PDO::prepare() ');
 			return null;
 		}
-
+		//
 		return $results;
 	}
 
@@ -590,17 +557,14 @@ class MsSqlServerConnection extends Connection
 	public function delete(string $query, array $data, bool $useNamedParams = false)
 	{
 		$results = 0;
-
-		try
-		{
+		//
+		try {
 			$results = $this->deleteQuery($query, $data, $useNamedParams);
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->processError($ex, $query, __METHOD__ . ' PDO::prepare() ');
 			return null;
 		}
-
+		//
 		return $results;
 	}
 
@@ -632,10 +596,10 @@ class MsSqlServerConnection extends Connection
 	 */
 	public function lastError()
 	{
-		if ($this->hasErrors())
-		{
+		if ($this->hasErrors()) {
 			return $this->errors[count($this->errors) - 1];
 		}
+		//
 		return null;
 	}
 
@@ -646,10 +610,10 @@ class MsSqlServerConnection extends Connection
 	 */
 	public function lastErrorIndex()
 	{
-		if ($this->hasErrors())
-		{
+		if ($this->hasErrors()) {
 			return count($this->errors) - 1;
 		}
+		//
 		return 0;
 	}
 
@@ -662,23 +626,19 @@ class MsSqlServerConnection extends Connection
 	public function transact(Closure $bunch)
 	{
 		$result = 0;
-
-		try
-		{
+		//
+		try {
 			$this->handle->beginTransaction();
 			$lei_before = $this->lastErrorIndex();
 			$result = $bunch();
 			$lei_after = $this->lastErrorIndex();
-
-			if ($lei_after > $lei_before)
-			{
+			//
+			if ($lei_after > $lei_before) {
 				throw new DatabaseQueryException('There are errors during transaction inside transact($bunch).');
 			}
-
+			//
 			$this->handle->commit();			
-		}
-		catch (Exception $ex)
-		{
+		} catch (Exception $ex) {
 			$this->errors[] = [
 				'type' => get_class($ex),
 				'code' => '' . $ex->getCode() . '',
@@ -687,7 +647,7 @@ class MsSqlServerConnection extends Connection
 			$this->handle->rollback();
 			return false;
 		}
-
+		//
 		return $result;
 	}
 

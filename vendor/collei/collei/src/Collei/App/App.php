@@ -74,6 +74,11 @@ class App
 	private $hidden_output = '';
 
 	/**
+	 *	@var array $caught_exceptions
+	 */
+	private $caught_exceptions = [];
+
+	/**
 	 *	@return void
 	 */
 	private function loadConfigs()
@@ -114,16 +119,14 @@ class App
 		$isBasefold = ($this->getConfigParam('app.basefolderInUrl', 0) == 1);
 		$info = [];
 		//
-		foreach ($sites as $site)
-		{
+		foreach ($sites as $site) {
 			$piece = [
 				'name' => $site,
 				'url' => PLAT_SITES_BASEURL . '/' . $site,
 				'ground' => PLAT_SITES_GROUND . DIRECTORY_SEPARATOR . $site,
 			];
 			//
-			if ($isBasefold)
-			{
+			if ($isBasefold) {
 				$piece['url'] = PLAT_FOLDER . '/' . $piece['url'];
 			}
 			//
@@ -145,13 +148,15 @@ class App
 			PLAT_DATABASE_FILE
 		];
 		//
-		foreach ($sectors as $sector)
-		{
+		foreach ($sectors as $sector) {
 			$sector_file = PLAT_APP_GROUND . DIRECTORY_SEPARATOR . $sector;
 			//
-			if (file_exists($sector_file))
-			{
-				require_once $sector_file;
+			try {
+				if (file_exists($sector_file)) {
+					require_once $sector_file;
+				}
+			} catch (Exception $exc) {
+				$this->caught_exceptions[] = $exc;
 			}
 		}
 		//
@@ -172,13 +177,15 @@ class App
 		//
 		$site_ground = $this->url->getGround();
 		//
-		foreach ($sectors as $sector)
-		{
+		foreach ($sectors as $sector) {
 			$sector_file = $site_ground . DIRECTORY_SEPARATOR . $sector;
-	
-			if (file_exists($sector_file))
-			{
-				require_once $sector_file;
+			//
+			try {
+				if (file_exists($sector_file)) {
+					require_once $sector_file;
+				}
+			} catch (Exception $exc) {
+				$this->caught_exceptions[] = $exc;
 			}
 		}
 	}
@@ -193,12 +200,9 @@ class App
 		//
 		$a_dir = PLAT_SITES_GROUND . DIRECTORY_SEPARATOR . $site_name;
 		//
-		if (is_dir($a_dir))
-		{
+		if (is_dir($a_dir)) {
 			$this->app_site = $site_name;
-		}
-		else
-		{
+		} else {
 			$this->app_site = PLAT_NAME;
 		}
 		//
@@ -448,7 +452,11 @@ class App
 	public function run()
 	{
 		try {
-			if ($this->runFilters()) {
+			if (!empty($this->caught_exceptions)) {
+				$this->prepareErrorResponse(
+					\array_pop(\array_reverse($this->caught_exceptions))
+				);
+			} elseif ($this->runFilters()) {
 				$this->runServlet();
 			}
 			//

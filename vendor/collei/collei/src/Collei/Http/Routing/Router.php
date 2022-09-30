@@ -344,7 +344,9 @@ class Router
 			}
 			//
 			$routeDescription = '('
-				. (is_array($routeMethod) ? implode(',', $routeMethod) : $routeMethod)
+				. (is_array($routeMethod)
+					? implode(',', $routeMethod) 
+					: $routeMethod)
 				. ")({$o_controller}::{$o_method})";
 			//
 			/*
@@ -373,7 +375,16 @@ class Router
 	 */
 	public static function verbs()
 	{
-		return ['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS','CONNECT'];
+		return [
+			'GET',
+			'POST',
+			'PUT',
+			'PATCH',
+			'DELETE',
+			'HEAD',
+			'OPTIONS',
+			'CONNECT',
+		];
 	}
 
 	/**
@@ -384,9 +395,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function get(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute(['GET','HEAD'], $path, $servletClass, $servletMethod);
+	public static function get(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			['GET','HEAD'], $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -397,9 +411,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function post(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('POST', $path, $servletClass, $servletMethod);
+	public static function post(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'POST', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -410,9 +427,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function put(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('PUT', $path, $servletClass, $servletMethod);
+	public static function put(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'PUT', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -423,9 +443,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function patch(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('PATCH', $path, $servletClass, $servletMethod);
+	public static function patch(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'PATCH', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -436,9 +459,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function delete(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('DELETE', $path, $servletClass, $servletMethod);
+	public static function delete(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'DELETE', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -449,9 +475,12 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function head(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('HEAD', $path, $servletClass, $servletMethod);
+	public static function head(
+		string $path, string $servletClass, string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'HEAD', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -462,9 +491,13 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function options(string $path, string $servletClass, string $servletMethod = null)
-	{
-		return self::makeRoute('OPTIONS', $path, $servletClass, $servletMethod);
+	public static function options(
+		string $path, string $servletClass,
+		string $servletMethod = null
+	) {
+		return self::makeRoute(
+			'OPTIONS', $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -476,9 +509,13 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function match(array $verbs, string $path, string $servletClass, string $servletMethod)
-	{
-		return self::makeRoute($verbs, $path, $servletClass, $servletMethod);
+	public static function match(
+		array $verbs, string $path,
+		string $servletClass, string $servletMethod
+	) {
+		return self::makeRoute(
+			$verbs, $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
@@ -489,22 +526,29 @@ class Router
 	 *	@param	string	$servletMethod
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function any(string $path, string $servletClass, string $servletMethod)
-	{
-		return self::makeRoute(self::verbs(), $path, $servletClass, $servletMethod);
+	public static function any(
+		string $path, string $servletClass, string $servletMethod
+	) {
+		return self::makeRoute(
+			self::verbs(), $path, $servletClass, $servletMethod
+		);
 	}
 
 	/**
-	 *	Register a default route to be invoked whenever an inexistent URI is requested
+	 *	Register a default route to be invoked whenever
+	 *	an inexistent URI is requested
 	 *
 	 *	@param	string	$servletClass
 	 *	@param	string	$servletMethod
 	 *	@param	string	$site
 	 *	@return	\Collei\Http\Routing\Route
 	 */
-	public static function default(string $servletClass, string $servletMethod, string $site = null)
-	{
-		return RouteResolver::makeDefaultRoute($servletClass, $servletMethod, $site);
+	public static function default(
+		string $servletClass, string $servletMethod, string $site = null
+	) {
+		return RouteResolver::makeDefaultRoute(
+			$servletClass, $servletMethod, $site
+		);
 	}
 
 }
