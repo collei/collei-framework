@@ -39,19 +39,15 @@ class AppURL extends URL
 	private function prospectRoot()
 	{
 		$path = $this->path;
-		if (str_starts_with($path, '/'))
-		{
+		if (str_starts_with($path, '/')) {
 			$path = substr($path, 1);
 		}
-
+		//
 		$path_parts = explode('/', $path, 3);
-		if (@count($path_parts) == 3)
-		{
+		if (@count($path_parts) == 3) {
 			$this->app_folder = $path_parts[1];
 			$this->app_root = '/' . $path_parts[0] . '/' . $path_parts[1];
-		}
-		else
-		{
+		} else {
 			$this->app_folder = null;
 			$this->app_root = '/';
 		}
@@ -65,21 +61,28 @@ class AppURL extends URL
 	private function locateGround()
 	{
 		$request_uri = $this->url;
-		if (is_null($this->app_root))
-		{
-			logerror('app_not_loadable', "App could not understand this request path: $request_uri ");
+		//
+		if (is_null($this->app_root)) {
+			logerror(
+				'app_not_loadable',
+				"App could not understand this request path: $request_uri "
+			);
 			return;
 		}
-
+		//
 		$fldr = $this->app_folder;
 		$flroot = $this->app_root;
 		$ground = PLAT_GROUND . str_replace('/', DIRECTORY_SEPARATOR, $this->app_root);
-		if (!is_dir($ground) && !is_dir(dirname($ground)))
-		{
-			logerror('app_not_loadable', "There is no App set for handling this request path: $request_uri \r\n\t\ton $ground\r\n\t\ton $fldr\r\n\t\twithin $flroot");
+		if (!is_dir($ground) && !is_dir(dirname($ground))) {
+			logerror(
+				'app_not_loadable',
+				"There is no App set for handling this request path:\r\n"
+					. "\r\n\t'$request_uri'\r\n\t\ton $ground"
+					. "\r\n\t\ton $fldr\r\n\t\twithin $flroot"
+			);
 			return;
 		}
-
+		//
 		$this->app_ground = $ground;
 		$this->app_has_ground = true;
 	}

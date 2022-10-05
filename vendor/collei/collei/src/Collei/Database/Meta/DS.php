@@ -27,8 +27,7 @@ class DS extends DataBox
 	 */
 	private static function init()
 	{
-		if (is_null(self::$conf))
-		{
+		if (is_null(self::$conf)) {
 			$file = PLAT_CONF_GROUND . DIRECTORY_SEPARATOR . '.dbc';
 			self::$conf = new ConfigFile($file);
 		}
@@ -73,23 +72,18 @@ class DS extends DataBox
 	 */
 	public static function hasTable(string $tableName, string $database = null)
 	{
-		if (!is_null($database))
-		{
-			if (array_key_exists($database, self::$databases))
-			{
+		if (!is_null($database)) {
+			if (array_key_exists($database, self::$databases)) {
 				return self::$databases[$database]->has($tableName);
 			}
-		}
-		else
-		{
-			foreach (self::$databases as $database)
-			{
-				if ($database->has($tableName))
-				{
+		} else {
+			foreach (self::$databases as $database) {
+				if ($database->has($tableName)) {
 					return true;
 				}
 			}
 		}
+		//
 		return false;
 	}
 
@@ -102,23 +96,18 @@ class DS extends DataBox
 	 */
 	public static function getTable(string $tableName, string $database = null)
 	{
-		if (!is_null($database))
-		{
-			if (array_key_exists($database, self::$databases))
-			{
+		if (!is_null($database)) {
+			if (array_key_exists($database, self::$databases)) {
 				return self::$databases[$database]->get($tableName);
 			}
-		}
-		else
-		{
-			foreach (self::$databases as $database)
-			{
-				if ($database->has($tableName))
-				{
+		} else {
+			foreach (self::$databases as $database) {
+				if ($database->has($tableName)) {
 					return $database->get($tableName);
 				}
 			}
 		}
+		//
 		return null;
 	}
 

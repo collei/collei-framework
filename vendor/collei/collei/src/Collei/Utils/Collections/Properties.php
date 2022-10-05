@@ -87,6 +87,18 @@ class Properties implements Iterator
 	}
 
 	/**
+	 *	Removes the specific value under the given $name 
+	 *
+	 *	@return	void
+	 */
+	public function remove(string $name)
+	{
+		if (isset($this->property_list[$name])) {
+			unset($this->property_list[$name]);
+		}
+	}
+
+	/**
 	 *	Returns all value keys
 	 *
 	 *	@return	array
