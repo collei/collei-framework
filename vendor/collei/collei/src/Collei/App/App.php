@@ -17,6 +17,13 @@ use Collei\App\AppURL;
 use Collei\App\Logger;
 use Collei\App\Loaders\ClassLoader;
 use Collei\Utils\Str;
+use Collei\App\Events\AppEvent;
+use Collei\App\Events\BeforeStartEvent;
+use Collei\App\Events\AfterStartEvent;
+use Collei\App\Events\BeforeRunEvent;
+use Collei\App\Events\AfterRunEvent;
+use Collei\App\Events\AppEventDispatcher;
+use Collei\App\Events\AppListenerProvider;
 use Exception;
 use Throwable;
 
@@ -298,21 +305,18 @@ class App
 			$this->request
 		);
 		//
-		if (empty($returned))
-		{
+		if (empty($returned)) {
 			return Response::make();
 		}
 		//
-		if (is_string($returned))
-		{
+		if (is_string($returned)) {
 			$response = Response::make();
 			$response->setBody($returned);
-
+			//
 			return $response;
 		}
 		//
-		if ($returned instanceof View)
-		{
+		if ($returned instanceof View) {
 			return $this->processView($returned);
 		}
 		//
@@ -358,22 +362,15 @@ class App
 	{
 		$filter = null;
 		//
-		if ($this->can_run)
-		{
+		if ($this->can_run) {
 			$returned = $this->callFilterChain($filter);
 			//
-			if ($returned !== true)
-			{
-				if ($returned instanceof View)
-				{
+			if ($returned !== true) {
+				if ($returned instanceof View) {
 					$this->response = $this->processView($returned);
-				}
-				elseif ($returned instanceof Response)
-				{
+				} elseif ($returned instanceof Response) {
 					$this->response = $returned;
-				}
-				else
-				{
+				} else {
 					$this->response = new Response();
 				}
 				//
@@ -381,9 +378,7 @@ class App
 			}
 			//
 			return true;
-		}
-		else
-		{
+		} else {
 			$this->response = Response::make();
 			//
 			$this->response->setBody(
@@ -421,17 +416,40 @@ class App
 	}
 
 	/**
+	 *	Fires event listeners calling
+	 *
+	 *	@param	string	$eventType
+	 *	@return	void
+	 */
+	private function dispatchEvent(string $eventType)
+	{
+		if (!is_a($eventType, AppEvent::class, true)) {
+			return;
+		}
+		//
+		$dispatcher = new AppEventDispatcher(
+			AppListenerProvider::getInstance()
+		);
+		//
+		$dispatcher->dispatch(new $eventType($this));
+	}
+
+	/**
 	 *	Fires app instance initialization
 	 *
 	 *	@param	\Collei\Http\Request	$request
 	 */
 	private function __construct(Request $request)
 	{
+		$this->dispatchEvent(BeforeStartEvent::class);
+		//
 		$this->initialize(
 			$request,
 			Response::make(),
 			Session::capture()
 		);
+		//
+		$this->dispatchEvent(AfterStartEvent::class);
 	}
 
 	/**
@@ -451,6 +469,8 @@ class App
 	 */
 	public function run()
 	{
+		$this->dispatchEvent(BeforeRunEvent::class);
+		//
 		try {
 			if (!empty($this->caught_exceptions)) {
 				$this->prepareErrorResponse(
@@ -466,6 +486,8 @@ class App
 		} catch (Exception $ex) {
 			$this->prepareErrorResponse($ex);
 		}
+		//
+		$this->dispatchEvent(AfterRunEvent::class);
 		//
 		$this->outputResponse();
 	}
