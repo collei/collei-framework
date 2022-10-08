@@ -1,6 +1,8 @@
 <?php
 namespace Collei\Events\Providers;
 
+use Collei\Events\Providers\ListenerProviderInterface;
+
 /**
  *	@author	Alarido	<alarido.su@gmail.com>
  *	@author	Collei Inc. <collei@collei.com.br>
@@ -41,6 +43,8 @@ class ListenerProvider implements ListenerProviderInterface
 	 */
 	public function addListener(string $eventType, callable $callable): self
 	{
+		logit(__METHOD__, print_r([$eventType, $callable], true));
+
 		$this->listeners[$eventType][] = $callable;
 		//
 		return $this;

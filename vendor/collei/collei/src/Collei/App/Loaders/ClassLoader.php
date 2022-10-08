@@ -35,59 +35,44 @@ class ClassLoader
 			[ 'which' => ['string'], 'default' => '' ],
 		];
 		//
-		foreach ($method->getParameters() as $param)
-		{
+		foreach ($method->getParameters() as $param) {
 			$name = $param->getName();
 			$type = $param->getType();
-
+			//
 			$type = (is_null($type) ? '' : $type->getName());
-
+			//
 			$val = '';
-
-			if (array_key_exists($name, $parameters))
-			{
+			//
+			if (array_key_exists($name, $parameters)) {
 				$val = $parameters[$name];
 			}
-			if (array_key_exists($index, $parameters))
-			{
+			//
+			if (array_key_exists($index, $parameters)) {
 				$val = $parameters[$index];
-			}
-			elseif ($param->isOptional())
-			{
+			} elseif ($param->isOptional()) {
 				$val = $param->getDefaultValue();
-			}
-			elseif ($param->allowsNull())
-			{
+			} elseif ($param->allowsNull()) {
 				$val = null;
-			}
-			else
-			{
+			} else {
 				throw new BadMethodCallException(
 					'Missing argument ' . $name . ' upon call to ' . $method.getName()
 				);
 			}
-
-			if ($type != '')
-			{
-				if ($type == gettype($val))
-				{
+			//
+			if ($type != '') {
+				if ($type == gettype($val)) {
 					$params[] = $val;
-				}
-				else
-				{
+				} else {
 					$done = false;
-
-					foreach ($defaults as $def)
-					{
-						if ($done = in_array($type, $def['which']))
-						{
+					//
+					foreach ($defaults as $def) {
+						if ($done = in_array($type, $def['which'])) {
 							$params[] = Value::castTo($val, $type, $def['default']);
 							break;
 						}
 					}
-
-					if (!$done)
-					{
+					//
+					if (!$done) {
 						throw new BadMethodCallException(
 							'Type mismatch for the argument ' . $name . ' upon call to ' . $method.getName()
 						);

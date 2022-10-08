@@ -1,7 +1,9 @@
 <?php
 namespace Collei\Events\Dispatchers;
 
+use Collei\Events\Providers\ListenerProviderInterface;
 use Collei\Events\Dispatchers\EventDispatcherInterface;
+use Collei\Events\Dispatchers\StoppableEventInterface;
 
 /**
  *	@author	Alarido	<alarido.su@gmail.com>

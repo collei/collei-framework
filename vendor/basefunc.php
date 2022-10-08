@@ -19,12 +19,16 @@ define('PLAT_FILTERS_FOLDER_NAME', 'filters');
 define('PLAT_MODELS_FOLDER_NAME', 'models');
 define('PLAT_SERVICES_FOLDER_NAME', 'services');
 define('PLAT_SERVLETS_FOLDER_NAME', 'servlets');
+define('PLAT_LISTENERS_FOLDER_NAME', 'listeners');
+define('PLAT_EVENTS_FOLDER_NAME', 'events');
 
 define('PLAT_APP_COMMANDS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_COMMANDS_FOLDER_NAME);
 define('PLAT_APP_FILTERS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_FILTERS_FOLDER_NAME);
 define('PLAT_APP_MODELS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_MODELS_FOLDER_NAME);
 define('PLAT_APP_SERVICES_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_SERVICES_FOLDER_NAME);
 define('PLAT_APP_SERVLETS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_SERVLETS_FOLDER_NAME);
+define('PLAT_APP_LISTENERS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_LISTENERS_FOLDER_NAME);
+define('PLAT_APP_EVENTS_FOLDER', PLAT_APP_FOLDER_NAME . DIR_SEP . PLAT_EVENTS_FOLDER_NAME);
 
 define('PLAT_CONF_FOLDER_NAME', 'conf');
 define('PLAT_CONF_GROUND', PLAT_GROUND . DIR_SEP . PLAT_CONF_FOLDER_NAME);
@@ -51,6 +55,8 @@ define('PLAT_SITES_FILTERS_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . P
 define('PLAT_SITES_MODELS_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . PLAT_MODELS_FOLDER_NAME);
 define('PLAT_SITES_SERVICES_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . PLAT_SERVICES_FOLDER_NAME);
 define('PLAT_SITES_SERVLETS_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . PLAT_SERVLETS_FOLDER_NAME);
+define('PLAT_SITES_LISTENERS_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . PLAT_LISTENERS_FOLDER_NAME);
+define('PLAT_SITES_EVENTS_FOLDER', PLAT_SITES_CLASSES_ROOT_FOLDER . DIR_SEP . PLAT_EVENTS_FOLDER_NAME);
 
 define('PLAT_STORAGE_FOLDER_NAME', 'storage');
 define('PLAT_STORAGE_GROUND', PLAT_GROUND . DIR_SEP . PLAT_STORAGE_FOLDER_NAME);
@@ -286,12 +292,11 @@ function require_site_class($site_name, $class_name)
 		. PLAT_CLASSES_SUFFIX;
 	$required = preg_replace('#(\\/+|\\\\+)#', DIR_SEP, $required);
 	//
-	if (file_exists($required))
-	{
+	if (file_exists($required)) {
 		require_once $required;
-
+		//
 		autold_logger("BYCALLER@$site_name: $class_name ",$required);
-
+		//
 		return true;
 	}
 	//
@@ -309,14 +314,14 @@ function require_manager_class($class_name)
 	$required = PLAT_GROUND . '/' . $class_name . PLAT_CLASSES_SUFFIX;
 	$required = preg_replace('#(\\/+|\\\\+)#', DIR_SEP, $required);
 	//
-	if (file_exists($required))
-	{
+	if (file_exists($required)) {
 		require_once $required;
-
+		//
 		autold_logger("BYCALLER@PLAT: $class_name ",$required);
-
+		//
 		return true;
 	}
+	//
 	return false;
 }
 
@@ -328,13 +333,12 @@ function require_manager_class($class_name)
  */
 function plat_plugin_register(string $name, array $info)
 {
-	if (!isset($GLOBALS['__app.plugins']))
-	{
+	if (!isset($GLOBALS['__app.plugins'])) {
 		$GLOBALS['__app.plugins'] = array();
 	}
-
+	//
 	$GLOBALS['__app.plugins'][$name] = $info;
-
+	//
 	return true;
 }
 
@@ -344,13 +348,12 @@ function plat_plugin_register(string $name, array $info)
  */
 function plat_site_register($site_name)
 {
-	if (!isset($GLOBALS['__app.sites']))
-	{
+	if (!isset($GLOBALS['__app.sites'])) {
 		$GLOBALS['__app.sites'] = array();
 	}
-
+	//
 	$site_folder = PLAT_SITES_GROUND . DIR_SEP . $site_name;
-
+	//
 	$GLOBALS['__app.sites'][$site_name] = array(
 		'site' => $site_name,
 		'source' => $site_folder . DIR_SEP . PLAT_SITES_CLASSES_ROOT_FOLDER,
@@ -365,26 +368,23 @@ function plat_site_scan()
 {
 	$site_dir = PLAT_SITES_GROUND;
 	$site_dir_subfolders = array_diff(scandir($site_dir), array('..', '.'));
-
-	foreach ($site_dir_subfolders as $sub_folder)
-	{
-		if (is_dir($site_dir . DIR_SEP . $sub_folder))
-		{
+	//
+	foreach ($site_dir_subfolders as $sub_folder) {
+		if (is_dir($site_dir . DIR_SEP . $sub_folder)) {
 			plat_site_register($sub_folder);
 		}
 	}
 }
-
 
 /*
  *	returns a list of loaded plugins
  */
 function plat_plugin_list()
 {
-	if (isset($GLOBALS['__app.plugins']))
-	{
+	if (isset($GLOBALS['__app.plugins'])) {
 		return array_keys($GLOBALS['__app.plugins']);
 	}
+	//
 	return null;
 }
 

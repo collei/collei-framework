@@ -39,6 +39,11 @@ init_loggers();
  */
 plat_site_scan();
 
+/*
+ *	register listeners
+ */
+\Collei\App\Events\Registerers\GlobalEventsRegisterer::scanForListeners();
+
 /**
  *	Loads and initializes the registered plugins
  *

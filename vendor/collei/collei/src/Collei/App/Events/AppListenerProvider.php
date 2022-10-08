@@ -32,5 +32,6 @@ class AppListenerProvider extends ListenerProvider implements ListenerProviderIn
 		//
 		return self::$instance;
 	}
+	
 }
 
