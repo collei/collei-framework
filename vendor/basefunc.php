@@ -8,7 +8,7 @@ define('PLAT_GROUND', dirname(__FILE__, 2));
 define('DIR_SEP', DIRECTORY_SEPARATOR);
 
 define('PLAT_LOGGING', [
-	'classloader' => false,
+	'classloader' => true,
 ]);
 
 define('PLAT_APP_FOLDER_NAME', 'app');
@@ -164,26 +164,6 @@ function html_to_display(...$anything)
 }
 
 /**
- *	Initializes the log keepers.
- *
- *	@return	void
- */
-function init_loggers()
-{
-	register_shutdown_function('finish_loggers');
-}
-
-/**
- *	Finishes the log keepers.
- *
- *	@return	void
- */
-function finish_loggers()
-{
-	\Collei\App\Logger::save('plat');
-}
-
-/**
  *	Checks for presence of $class_name, returns false if it does not exist.
  *	For the sake of @inject in views, returns true if $class_name is empty
  *
@@ -197,6 +177,33 @@ function has_class(string $class_name = null)
 	}
 	//
 	return \Collei\App\Environment::hasClass($class_name);
+}
+
+/**
+ *	Loads site classes manually. For use of \Collei\App\App class.
+ *
+ *	@param	mixed	$site_name
+ *	@param	mixed	$class_name
+ *	@return	void
+ */
+function require_site_class($site_name, $class_name)
+{
+	return \Collei\App\Loaders\ClassLoader::requireSiteClass(
+		$site_name, $class_name
+	);
+}
+
+/**
+ *	Loads Platform manager classes. For use of the \Collei\App\App class.
+ *
+ *	@param	mixed	$class_name
+ *	@return	bool
+ */
+function require_manager_class($class_name)
+{
+	return \Collei\App\Loaders\ClassLoader::requireManagerClass(
+		$class_name
+	);
 }
 
 /**
@@ -272,6 +279,19 @@ function genv($name)
 function senv($name, $value)
 {
 	\Collei\App\Environment::setAppEnv($name, $value);
+}
+
+/**
+ *	Sets one (or more) value(s) to variable(s) in the App environment
+ *
+ *	@param	array	$namedValues
+ *	@return	void
+ */
+function senvs(array $namedValues)
+{
+	foreach ($namedValues as $name => $value) {
+		\Collei\App\Environment::setAppEnv($name, $value);
+	}
 }
 
 /**

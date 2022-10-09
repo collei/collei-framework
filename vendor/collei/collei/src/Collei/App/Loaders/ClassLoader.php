@@ -1,7 +1,10 @@
 <?php
 namespace Collei\App\Loaders;
 
+require_once dirname(__FILE__) . '/LoggerTrait.php';
+
 use Collei\Utils\Values\Value;
+use Collei\App\Loaders\LoggerTrait;
 use ReflectionClass;
 use ReflectionMethod;
 use Exception;
@@ -15,6 +18,8 @@ use BadMethodCallException;
  */
 class ClassLoader 
 {
+	use LoggerTrait;
+
 	/**
 	 *	@static
 	 *	@var array $instances
@@ -163,6 +168,10 @@ class ClassLoader
 	 */
 	public static function requireSiteClass(string $siteName, string $className)
 	{
+		if (class_exists($className)) {
+			return false;
+		}
+		//
 		$required = preg_replace(
 			'#(\\/+|\\\\+)#',
 			DIRECTORY_SEPARATOR,
@@ -170,7 +179,7 @@ class ClassLoader
 		);
 		//
 		if (file_exists($required)) {
-			require_once $required;
+			require $required;
 			//
 			autold_logger(
 				__METHOD__, "required \"$className\" from \"$required\""
@@ -191,6 +200,10 @@ class ClassLoader
 	 */
 	public static function requireManagerClass(string $className)
 	{
+		if (class_exists($className)) {
+			return false;
+		}
+		//
 		$required = preg_replace(
 			'#(\\/+|\\\\+)#',
 			DIRECTORY_SEPARATOR,
@@ -198,9 +211,9 @@ class ClassLoader
 		);
 		//
 		if (file_exists($required)) {
-			require_once $required;
+			require $required;
 			//
-			autold_logger(
+			self::log(
 				__METHOD__, "required \"$className\" from \"$required\""
 			);
 			//
