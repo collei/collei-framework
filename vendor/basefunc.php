@@ -184,324 +184,94 @@ function finish_loggers()
 }
 
 /**
- *	Gathers the full path for the view source for a given site.
- *
- *	@param	mixed	$view_name
- *	@param	mixed	$site_name
- *	@param	mixed	&$site_from
- *	@return	mixed
- */
-function plat_site_view_filename($view_name, $site_name, &$site_from)
-{
-	$view = (!is_null($view_name) ? trim($view_name) : '');
-	$site_from = '';
-
-	if (preg_match('/^\w+(\.\w+)*$/', $view) === false)
-	{
-		return false;
-	}
-	if (is_null($site_name) || empty($site_name))
-	{
-		$site_from = '';
-		return plat_system_view_filename($view_name);
-	}
-
-	$view_platform = PLAT_RESOURCE_VIEWS_GROUND
-		. DIR_SEP . str_replace('.', DIR_SEP, $view)
-		. PLAT_VIEWS_SUFFIX;
-
-	$view_site = PLAT_SITES_GROUND
-		. DIR_SEP . $site_name
-		. DIR_SEP . PLAT_RESOURCE_VIEWS_FOLDER
-		. DIR_SEP . str_replace('.', DIR_SEP, $view)
-		. PLAT_VIEWS_SUFFIX;
-
-	if (file_exists($view_site))
-	{
-		$site_from = $site_name;
-		return $view_site;
-	}
-	if (file_exists($view_platform))
-	{
-		return $view_platform;
-	}
-	return false;
-}
-
-/**
  *	Checks for presence of $class_name, returns false if it does not exist.
  *	For the sake of @inject in views, returns true if $class_name is empty
  *
  *	@param	string	$class_name = null
- *	@return	void
+ *	@return	bool
  */
 function has_class(string $class_name = null)
 {
-	if (empty($class_name))
-	{
-		return true;
-	}
-
-	autold_logger("has_class() ", $class_name ?? '');
-	require_manager_class($class_name);
-
-	if ($site = \Collei\App\App::getInstance()->getSite())
-	{
-		autold_logger("has_class() ", $class_name ?? '');
-		require_site_class($site, $class_name);
-	}
-
-	return class_exists($class_name, true);
-}
-
-/**
- *	Gathers the full path for the view source file of main platform site.
- *
- *	@param	mixed	$view_name
- *	@return	mixed
- */
-function plat_system_view_filename($view_name)
-{
-	$view = (!is_null($view_name) ? trim($view_name) : '');
-	if (preg_match('/^\w+(\.\w+)*$/', $view) === false)
-	{
-		return false;
-	}
-
-	$view_platform = PLAT_RESOURCE_VIEWS_GROUND
-		. DIR_SEP . str_replace('.', DIR_SEP, $view)
-		. PLAT_VIEWS_SUFFIX;
-
-	if (file_exists($view_platform))
-	{
-		return $view_platform;
-	}
-	return false;
-}
-
-/**
- *	Loads site classes manually. For use of \Collei\App\App class.
- *
- *	@param	mixed	$site_name
- *	@param	mixed	$class_name
- *	@return	void
- */
-function require_site_class($site_name, $class_name)
-{
-	$required = PLAT_SITES_GROUND . '/' . $site_name . '/' . $class_name
-		. PLAT_CLASSES_SUFFIX;
-	$required = preg_replace('#(\\/+|\\\\+)#', DIR_SEP, $required);
-	//
-	if (file_exists($required)) {
-		require_once $required;
-		//
-		autold_logger("BYCALLER@$site_name: $class_name ",$required);
-		//
+	if (empty($class_name)) {
 		return true;
 	}
 	//
-	return false;
-}
-
-/**
- *	Loads Platform manager classes. For use of the \Collei\App\App class.
- *
- *	@param	mixed	$class_name
- *	@return	bool
- */
-function require_manager_class($class_name)
-{
-	$required = PLAT_GROUND . '/' . $class_name . PLAT_CLASSES_SUFFIX;
-	$required = preg_replace('#(\\/+|\\\\+)#', DIR_SEP, $required);
-	//
-	if (file_exists($required)) {
-		require_once $required;
-		//
-		autold_logger("BYCALLER@PLAT: $class_name ",$required);
-		//
-		return true;
-	}
-	//
-	return false;
+	return \Collei\App\Environment::hasClass($class_name);
 }
 
 /**
  *	Keeps plugin tracking for the system
  *
+ *	@param	string	$pluginName
  *	@param	array	$info
  *	@return	void
  */
 function plat_plugin_register(string $name, array $info)
 {
-	if (!isset($GLOBALS['__app.plugins'])) {
-		$GLOBALS['__app.plugins'] = array();
-	}
-	//
-	$GLOBALS['__app.plugins'][$name] = $info;
-	//
-	return true;
+	\Collei\App\Environment::registerPlugin($name, $info);
 }
 
-
-/*
- *	keep site tracking
- */
-function plat_site_register($site_name)
-{
-	if (!isset($GLOBALS['__app.sites'])) {
-		$GLOBALS['__app.sites'] = array();
-	}
-	//
-	$site_folder = PLAT_SITES_GROUND . DIR_SEP . $site_name;
-	//
-	$GLOBALS['__app.sites'][$site_name] = array(
-		'site' => $site_name,
-		'source' => $site_folder . DIR_SEP . PLAT_SITES_CLASSES_ROOT_FOLDER,
-	);
-}
-
-
-/*
- *	performs site registration
- */
-function plat_site_scan()
-{
-	$site_dir = PLAT_SITES_GROUND;
-	$site_dir_subfolders = array_diff(scandir($site_dir), array('..', '.'));
-	//
-	foreach ($site_dir_subfolders as $sub_folder) {
-		if (is_dir($site_dir . DIR_SEP . $sub_folder)) {
-			plat_site_register($sub_folder);
-		}
-	}
-}
-
-/*
- *	returns a list of loaded plugins
+/**
+ *	Returns a list of the loaded plugins' names.
+ *
+ *	@return	array
  */
 function plat_plugin_list()
 {
-	if (isset($GLOBALS['__app.plugins'])) {
-		return array_keys($GLOBALS['__app.plugins']);
-	}
-	//
-	return null;
+	return \Collei\App\Environment::listPlugins();
 }
 
-
-/*
- *	returns a list of loaded plugins and their info
+/**
+ *	Returns a list of the loaded plugins and their info.
+ *
+ *	@return	array
  */
 function plat_plugin_list_info()
 {
-	if (isset($GLOBALS['__app.plugins']))
-	{
-		return $list = $GLOBALS['__app.plugins'];
-	}
-	return null;
+	return \Collei\App\Environment::listPluginsInfo();
 }
 
-
-/*
- *	returns a list of existing sites
+/**
+ *	Returns a list of registered sites
+ *
+ *	@return	array
  */
 function plat_site_list()
 {
-	if (isset($GLOBALS['__app.sites']))
-	{
-		return array_keys($GLOBALS['__app.sites']);
-	}
-	return null;
+	return \Collei\App\Environment::listSites();
 }
 
+/**
+ *	Returns a list of registered sites with their info
+ *
+ *	@return	array
+ */
+function plat_site_list_info()
+{
+	return \Collei\App\Environment::listSitesInfo();
+}
 
-/*
- *	easy way of keeping temp config vars
+/**
+ *	Gets value from a variable in the App environment
+ *
+ *	@param	string	$name
+ *	@return	mixed|null
  */
 function genv($name)
 {
-	if (isset($GLOBALS['__app.debugging']))
-	{
-		if (isset($GLOBALS['__app.debugging'][$name]))
-		{
-			return $GLOBALS['__app.debugging'][$name];
-		}
-	}
-	return null;
+	return \Collei\App\Environment::getAppEnv($name);
 }
 
+/**
+ *	Sets a value to a variable in the App environment
+ *
+ *	@param	string	$name
+ *	@param	mixed	$value
+ *	@return	void
+ */
 function senv($name, $value)
 {
-	if (!isset($GLOBALS['__app.debugging']))
-	{
-		$GLOBALS['__app.debugging'] = array();
-	}
-	$GLOBALS['__app.debugging'][$name] = $value;
-	return true;
-}
-
-senv('debug-errors', true);
-senv('debug-warnings', false);
-senv('debug-notices', false);
-senv('debug-raws', false);
-
-
-/*
- *	easiful pattern matching for parameter extraction
- */
-function fetch_uri_pattern($route_uri)
-{
-	$str_route = \Collei\Utils\Str::stripAfter($route_uri, '?');
-	$outer_pattern = '[^\x2F]*';
-	$pattern = '/^'.str_replace('/','\/',preg_replace('/\{[^}\/]*\}/m', $outer_pattern, $str_route)).'\/?$/';
-	//
-	return $pattern;
-}
-
-function fetch_uri_parameters($data_uri, $data_pattern)
-{
-	/*
-	 *	pattern:	/cities/{city}/streets/{street}/homes/{home}
-	 *	uri:		/cities/39/streets/27/homes/167
-	 */
-	$str_uri = $data_uri;
-	$str_pattern = $data_pattern;
-	$str_medium = preg_filter('/\{[^}\/]+\}/m', '*', $str_pattern);
-
-	if (str_ends_with($str_uri, '/'))
-	{
-		$str_uri = substr($str_uri, 0, -1);
-	}
-
-	$arr_uri = explode('/', $str_uri);
-	$arr_pattern = explode('/', $str_pattern);
-	$arr_medium = explode('/', $str_medium);
-
-	$len = count($arr_pattern);
-
-	if (count($arr_uri) != $len || count($arr_medium) != $len)
-	{
-		return null;
-	}
-
-	$resulting_values = array();
-
-	foreach ($arr_pattern as $i => $item_pattern)
-	{
-		$item_uri = $arr_uri[$i];
-		$item_medium = $arr_medium[$i];
-
-		if ($item_medium != '')
-		{
-			if ($item_pattern != $item_uri)
-			{
-				$name = substr($item_pattern, 1, -1);
-				$resulting_values[$name] = trim($item_uri);
-			}
-		}
-	}
-
-	return $resulting_values;
+	\Collei\App\Environment::setAppEnv($name, $value);
 }
 
 /**
@@ -514,23 +284,23 @@ function dir_lis(string $path)
 {
 	$dirs = [];
 	$items = scandir($path);
-
-	foreach ($items as $item)
-	{
-		if (in_array($item, ['.','..']))
-		{
+	//
+	foreach ($items as $item) {
+		if (in_array($item, ['.','..'])) {
 			continue;
 		}
-
-		if (is_dir($path . DIR_SEP . $item))
-		{
+		//
+		if (is_dir($path . DIR_SEP . $item)) {
 			$dirs[] = $item;
 		}
 	}
-
+	//
 	return $dirs;
 }
 
+/*----------------------------------------------------------*
+ *	Function wrappers for support on earlier PHP versions	*
+ *----------------------------------------------------------*/
 
 if (!function_exists('str_starts_with'))
 {
@@ -543,7 +313,9 @@ if (!function_exists('str_starts_with'))
 	 */
 	function str_starts_with(string $haystack, string $needle)
 	{
-		return (string)$needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0;
+		return (string)$needle !== '' && strncmp(
+			$haystack, $needle, strlen($needle)
+		) === 0;
 	}
 }
 
@@ -558,7 +330,9 @@ if (!function_exists('str_ends_with'))
 	 */
 	function str_ends_with(string $haystack, string $needle)
 	{
-		return $needle !== '' && substr($haystack, -strlen($needle)) === (string)$needle;
+		return $needle !== '' && substr(
+			$haystack, -strlen($needle)
+		) === (string)$needle;
 	}
 }
 
@@ -587,8 +361,7 @@ if (!function_exists('array_key_last'))
 	 */
 	function array_key_last(array $array)
 	{
-		if (!is_array($array) || empty($array))
-		{
+		if (!is_array($array) || empty($array)) {
 			return NULL;
 		}
 		//

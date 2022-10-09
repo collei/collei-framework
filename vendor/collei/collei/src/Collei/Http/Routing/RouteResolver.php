@@ -4,6 +4,7 @@ namespace Collei\Http\Routing;
 use Collei\App\App;
 use Collei\Http\Request;
 use Collei\Http\Routing\Route;
+use Collei\Utils\Str;
 
 /**
  *	Embodies router resolving
@@ -171,6 +172,24 @@ class RouteResolver
 	}
 
 	/**
+	 *	Performs RegEx Pattern generation for parameter extraction
+	 *
+	 *	@static
+	 *	@param	string	$routeURI
+	 *	@return	bool
+	 */
+	private static function fetchRegexPatternFromURI($routeURI)
+	{
+		$str_route = Str::stripAfter($routeURI, '?');
+		$outer_pattern = '[^\x2F]*';
+		$pattern = '/^'.str_replace(
+			'/', '\/', preg_replace('/\{[^}\/]*\}/m', $outer_pattern, $str_route)
+		).'\/?$/';
+		//
+		return $pattern;
+	}
+
+	/**
 	 *	Performs URI matching with the given Route
 	 *
 	 *	@static
@@ -196,7 +215,7 @@ class RouteResolver
 			return true;
 		}
 		//
-		$pattern = fetch_uri_pattern($str_route);
+		$pattern = self::fetchRegexPatternFromURI($str_route);
 		$res = preg_match($pattern, $str_uri);
 		//
 		return $res;

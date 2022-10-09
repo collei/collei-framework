@@ -170,6 +170,56 @@ class Request implements Routeable, Capturable
 	private $route = null;
 
 	/**
+	 *	Extract data from URI using route parameters and
+	 *	returns them as an array of values indexed by their names.
+	 *
+	 *	@param	string	$dataURI
+	 *	@param	string	$dataPattern
+	 *	@return	array
+	 */
+	private static function fetchParametersFromURI(
+		string $dataURI, string $dataPattern
+	) {
+		/*
+		 *	pattern:	/cities/{city}/streets/{street}/homes/{home}
+		 *	uri:		/cities/39/streets/27/homes/167
+		 */
+		$str_uri = $dataURI;
+		$str_pattern = $dataPattern;
+		$str_medium = preg_filter('/\{[^}\/]+\}/m', '*', $str_pattern);
+		//
+		if (str_ends_with($str_uri, '/')) {
+			$str_uri = substr($str_uri, 0, -1);
+		}
+		//
+		$arr_uri = explode('/', $str_uri);
+		$arr_pattern = explode('/', $str_pattern);
+		$arr_medium = explode('/', $str_medium);
+		//
+		$len = count($arr_pattern);
+		//
+		if (count($arr_uri) != $len || count($arr_medium) != $len) {
+			return null;
+		}
+		//
+		$resulting_values = array();
+		//
+		foreach ($arr_pattern as $i => $item_pattern) {
+			$item_uri = $arr_uri[$i];
+			$item_medium = $arr_medium[$i];
+			//
+			if ($item_medium != '') {
+				if ($item_pattern != $item_uri) {
+					$name = substr($item_pattern, 1, -1);
+					$resulting_values[$name] = trim($item_uri);
+				}
+			}
+		}
+		//
+		return $resulting_values;
+	}
+
+	/**
 	 *	Extract data from URI through route parameters
 	 *
 	 *	@return	void
@@ -178,8 +228,11 @@ class Request implements Routeable, Capturable
 	{
 		$path_request = $this->path;
 		$path_route = $this->route->getPath();
-		$route_params = fetch_uri_parameters($path_request, $path_route);
-
+		//
+		$route_params = self::fetchParametersFromURI(
+			$path_request, $path_route
+		);
+		//
 		if (!is_null($route_params)) {
 			$this->attributes->adds($route_params);
 		}

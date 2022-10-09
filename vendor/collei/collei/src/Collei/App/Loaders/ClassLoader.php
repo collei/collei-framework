@@ -16,16 +16,23 @@ use BadMethodCallException;
 class ClassLoader 
 {
 	/**
+	 *	@static
 	 *	@var array $instances
 	 */
 	private static $instances = [];
 
 	/**
+	 *	Performs parameter filtering on passed $parameters based upon
+	 *	method parameters.
 	 *
-	 *
+	 *	@static
+	 *	@param	ReflectionMethod	$method
+	 *	@param	array	$parameters
+	 *	@return	array
 	 */
-	private static function filterParameters($method, $parameters)
-	{
+	private static function filterParameters(
+		ReflectionMethod $method, array $parameters
+	) {
 		$index = 0;
 		$params = [];
 		$defaults = [
@@ -55,7 +62,9 @@ class ClassLoader
 				$val = null;
 			} else {
 				throw new BadMethodCallException(
-					'Missing argument ' . $name . ' upon call to ' . $method.getName()
+					'Missing argument '
+						. $name . ' upon call to '
+						. $method.getName()
 				);
 			}
 			//
@@ -67,14 +76,19 @@ class ClassLoader
 					//
 					foreach ($defaults as $def) {
 						if ($done = in_array($type, $def['which'])) {
-							$params[] = Value::castTo($val, $type, $def['default']);
+							$params[] = Value::castTo(
+								$val, $type, $def['default']
+							);
+							//
 							break;
 						}
 					}
 					//
 					if (!$done) {
 						throw new BadMethodCallException(
-							'Type mismatch for the argument ' . $name . ' upon call to ' . $method.getName()
+							'Type mismatch for the argument '
+								. $name . ' upon call to '
+								. $method.getName()
 						);
 					}
 				}
@@ -91,9 +105,12 @@ class ClassLoader
 	/**
 	 *	Loads classes reflectly
 	 *
-	 *
+	 *	@static
+	 *	@param	string	$virtual
+	 *	@param	array	$parameters = []
+	 *	@return	object|null
 	 */
-	private static function instantiate($virtual, array $parameters = [])
+	private static function instantiate(string $virtual, array $parameters = [])
 	{
 		if (empty($virtual)) {
 			return null;
@@ -120,6 +137,7 @@ class ClassLoader
 	/**
 	 *	Static factory of instances
 	 *
+	 *	@static
 	 *	@param	mixed	$virtual
 	 *	@param	array	$params
 	 *	@return	mixed
@@ -130,7 +148,66 @@ class ClassLoader
 			return static::$instances[$virtual];
 		}
 		//
-		return static::$instances[$virtual] = static::instantiate($virtual, $params);
+		return static::$instances[$virtual] = static::instantiate(
+			$virtual, $params
+		);
+	}
+
+	/**
+	 *	Loads site classes manually. For use of \Collei\App\App class.
+	 *
+	 *	@static
+	 *	@param	mixed	$siteName
+	 *	@param	mixed	$className
+	 *	@return	bool
+	 */
+	public static function requireSiteClass(string $siteName, string $className)
+	{
+		$required = preg_replace(
+			'#(\\/+|\\\\+)#',
+			DIRECTORY_SEPARATOR,
+			PLAT_SITES_GROUND . "/$siteName/$className"	. PLAT_CLASSES_SUFFIX
+		);
+		//
+		if (file_exists($required)) {
+			require_once $required;
+			//
+			autold_logger(
+				__METHOD__, "required \"$className\" from \"$required\""
+			);
+			//
+			return true;
+		}
+		//
+		return false;
+	}
+
+	/**
+	 *	Loads manager classes manually. For use of \Collei\App\App class.
+	 *
+	 *	@static
+	 *	@param	mixed	$className
+	 *	@return	bool
+	 */
+	public static function requireManagerClass(string $className)
+	{
+		$required = preg_replace(
+			'#(\\/+|\\\\+)#',
+			DIRECTORY_SEPARATOR,
+			PLAT_GROUND . "/$className"	. PLAT_CLASSES_SUFFIX
+		);
+		//
+		if (file_exists($required)) {
+			require_once $required;
+			//
+			autold_logger(
+				__METHOD__, "required \"$className\" from \"$required\""
+			);
+			//
+			return true;
+		}
+		//
+		return false;
 	}
 
 }

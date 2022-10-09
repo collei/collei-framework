@@ -43,8 +43,6 @@ class ListenerProvider implements ListenerProviderInterface
 	 */
 	public function addListener(string $eventType, callable $callable): self
 	{
-		logit(__METHOD__, print_r([$eventType, $callable], true));
-
 		$this->listeners[$eventType][] = $callable;
 		//
 		return $this;

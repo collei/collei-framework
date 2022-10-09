@@ -6,6 +6,7 @@ use Collei\Http\Session;
 use Collei\Views\ConstructBase;
 use Collei\Views\ColleiViewException;
 use Collei\Views\ViewValidator;
+use Collei\Views\ViewLocator;
 use Collei\Utils\Str;
 use Collei\Utils\Files\TextFile;
 use Collei\Database\Yanfei\Model;
@@ -71,18 +72,22 @@ class ViewRenderer
 	 *	@param	string	&$fromSite
 	 *	@return	string
 	 */
-	public static function locate(string $viewName, App $appInstance, string &$fromSite)
-	{
+	public static function locate(
+		string $viewName, App $appInstance, string &$fromSite
+	) {
 		$site = $appInstance->getSite();
 		$fromSite = '';
-		$filename = plat_site_view_filename($viewName, $site, $fromSite);
-
-		if ($filename !== false)
-		{
+		$filename = ViewLocator::locateViewFile($viewName, $site, $fromSite);
+		//
+		if ($filename !== false) {
 			return $filename;
 		}
-
-		logerror('view_processing', self::class . "::locate(): View $viewName not found on $site ... [$filename] ");
+		//
+		logerror(
+			'view_processing',
+			__METHOD__ . ": View $viewName not found on $site [$filename] "
+		);
+		//
 		return false;
 	}
 
