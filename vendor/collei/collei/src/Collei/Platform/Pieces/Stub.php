@@ -39,18 +39,15 @@ class Stub
 		$this->path = static::$location . DIRECTORY_SEPARATOR
 						. $category . DIRECTORY_SEPARATOR
 						. $name . PLAT_STUB_SUFFIX;
-
-		if (file_exists($this->path))
-		{
+		//
+		if (file_exists($this->path)) {
 			$thing = ($this->content = TextFile::from($this->path));
 			//
 			$this->loaded = !empty($thing);
-		}
-		else
-		{
+		} else {
 			$this->loaded = false;
 		}
-
+		//
 		return $this;
 	}
 
@@ -67,17 +64,15 @@ class Stub
 	public function fetch(array $values): string
 	{
 		$text = '';
-
-		if ($this->content)
-		{
+		//
+		if ($this->content) {
 			$text = $this->content->getText();
-
-			foreach ($values as $n => $v)
-			{
+			//
+			foreach ($values as $n => $v) {
 				$text = Str::replace(('{' . $n . '}'), $v, $text);
 			}
 		}
-
+		//
 		return $text;
 	}
 
@@ -100,12 +95,11 @@ class Stub
 	public static function load(string $name, string $category): ?Stub
 	{
 		$stub = (new static())->loadFrom($name, $category);
-
-		if ($stub->loaded)
-		{
+		//
+		if ($stub->loaded) {
 			return $stub;
 		}
-
+		//
 		return null;
 	}
 

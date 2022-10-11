@@ -1,0 +1,23 @@
+<?php
+namespace App\Listeners;
+
+use App\Events\{eventClassName};
+
+/**
+ *	@author	Alarido	<alarido.su@gmail.com>
+ *	@author	Collei Inc. <collei@collei.com.br>
+ *	@since	2022-10-06
+ *
+ *	Mapper from an event to the proper listeners for that event
+ */
+class {className}
+{
+	public function __invoke({eventClassName} $event)
+	{
+		/**
+		 * @todo your relevant code here
+		 */
+	}
+
+}
+

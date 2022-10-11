@@ -181,7 +181,7 @@ class ClassLoader
 		if (file_exists($required)) {
 			require $required;
 			//
-			autold_logger(
+			self::log(
 				__METHOD__, "required \"$className\" from \"$required\""
 			);
 			//

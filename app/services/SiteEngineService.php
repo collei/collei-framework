@@ -15,6 +15,8 @@ class SiteEngineService extends Service
 		PLAT_MODELS_FOLDER_NAME,
 		PLAT_SERVICES_FOLDER_NAME,
 		PLAT_SERVLETS_FOLDER_NAME,
+		PLAT_EVENTS_FOLDER_NAME,
+		PLAT_LISTENERS_FOLDER_NAME,
 	];
 
 	private static $dir = null;
@@ -38,7 +40,13 @@ class SiteEngineService extends Service
 		//
 		if ($dir = groundOf($engine)) {
 			$target = static::makeTarget($dir, $kind);
-			$files = array_diff(scandir($target), ['.','..']);
+			$files = [];
+			//
+			if ($scanned = scandir($target)) {
+				$files = array_diff($scanned, ['.','..']);
+			} else {
+				return [];
+			}
 			//
 			foreach ($files as $file) {
 				$filepath = $target . DIRECTORY_SEPARATOR . $file;
@@ -58,12 +66,12 @@ class SiteEngineService extends Service
 		return $list;
 	}
 
-	private function getContentFor($classname, $element, array $variables = [])
+	private function getContentFor($className, $element, array $variables = [])
 	{
 		if (in_array($element, self::$subfolders)) {
 			if ($stub = Stub::load($element, PLAT_STUB_CATEGORY_CLASSES)) {
 				$variables = \array_merge($variables, [
-					'className' => $classname
+					'className' => $className
 				]);
 				return $stub->fetch($variables);
 			}
@@ -72,6 +80,32 @@ class SiteEngineService extends Service
 		return '';
 	}
 
+	private function subCreateFile(
+		$className, $engine, $element, array $variables = [],
+		bool $overwrite = false
+	) {
+		if ($dir = groundOf($engine)) {
+			$content = $this->getContentFor($className, $element, $variables);
+			$target = static::makeTarget($dir, $element);
+			$targetFile = $target . DIRECTORY_SEPARATOR
+				. $className . PLAT_CLASSES_SUFFIX;
+			//
+			if (!is_dir($target) && !is_file($target)) {
+				mkdir($target);
+			}
+			//
+			if ($overwrite) {
+				file_put_contents($targetFile, $content);
+			} elseif (!file_exists($targetFile)) {
+				file_put_contents($targetFile, $content);
+			} else {
+				return false;
+			}
+			//
+			return true;
+		}
+
+	}
 
 	///////////////////////
 
@@ -100,34 +134,38 @@ class SiteEngineService extends Service
 		return $this->listFiles($engine, 'commands');
 	}
 
+	public function listEvents($engine)
+	{
+		return $this->listFiles($engine, 'events');
+	}
+
+	public function listListeners($engine)
+	{
+		return $this->listFiles($engine, 'listeners');
+	}
+
 	public function createFile(
-		$classname, $engine, $element, array $variables = []
+		$className, $engine, $element, array $variables = []
 	) {
-		if (empty($classname) || empty($engine)) {
+		if (empty($className) || empty($engine)) {
 			return false;
 		}
 		//
-		if ($dir = groundOf($engine)) {
-			$subfolder = in_array($element, static::$subfolders)
-				? $element
-				: PLAT_MODELS_FOLDER_NAME;
-			//
-			$content = $this->getContentFor($classname, $element, $variables);
-			$target = static::makeTarget($dir, $element);
-			$targetFile = $target . DIRECTORY_SEPARATOR
-				. $classname . PLAT_CLASSES_SUFFIX;
-			//
-			if (!is_dir($target) && !is_file($target)) {
-				mkdir($target);
-			}
-			//
-			file_put_contents($targetFile, $content);
-			//
-			return true;
-		}
-		//
-		return false;
+		return $this->subCreateFile(
+			$className, $engine, $element, $variables, false
+		);
 	}
 
+	public function createFileOverwrite(
+		$className, $engine, $element, array $variables = []
+	) {
+		if (empty($className) || empty($engine)) {
+			return false;
+		}
+		//
+		return $this->subCreateFile(
+			$className, $engine, $element, $variables, true
+		);
+	}
 
 }

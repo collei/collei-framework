@@ -42,6 +42,8 @@ class ContactRetainerService extends Service
 			$person->avatar = $this->saveUploaded($upload);
 		}
 		$person->save();
+		//
+		return $person;
 	}
 
 	public function createMean($mean, $detail, $mean_type, $contact_id)

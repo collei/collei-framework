@@ -49,5 +49,18 @@ class EventDispatcher implements EventDispatcherInterface
 		//
 		return $event;
 	}
+
+	/**
+	 *	Builds with the Provider in and returns it.
+	 *
+	 *	@param	object	$event
+	 *	@return	self
+	 */
+	public static function to(ListenerProviderInterface $provider)
+	{
+		return new self($provider);
+	}
+
+
 }
 

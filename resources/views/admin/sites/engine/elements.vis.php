@@ -29,6 +29,11 @@
 							<input type="hidden" name="element" value="{{ $element }}" />
 							<input type="text" name="classname" size="25">
 							<span>{{ PLAT_CLASSES_SUFFIX }}</span>
+							@if($element == 'listeners')
+								&nbsp; &nbsp; <label><b>for the event:</b></label>
+								<input type="text" name="eventclassname" size="25">
+								<span>{{ PLAT_CLASSES_SUFFIX }}</span>
+							@endif
 							<button type="submit" class="btn btn-primary">Create</button>
 						</form>
 					</div>

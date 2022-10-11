@@ -24,25 +24,36 @@ use App\Services\QrCodeService;
 use Collei\Utils\Values\Capsule;
 use Collei\Utils\Parsers\RawRequestBodyParser;
 
+use App\Events\ContactAddEvent;
+use App\Listeners\ContactAddListener;
+use Collei\Events\Dispatchers\EventDispatcher;
+use Collei\Events\Providers\ListenerProvider;
+
 class ContactBookServlet extends HttpServlet
 {
 	private $contactRetainer;
 	private $tagManager;
 	private $qrcoder;
+	private $listenerProvider;
 
 	public function __construct(
 		Request $request,
 		ContactRetainerService $contactRetainer,
 		TagManagerService $tagManager,
-		QrCodeService $qrcode
-	)
-	{
+		QrCodeService $qrcode,
+		ListenerProvider $listenerProvider
+	) {
 		parent::__construct($request);
 		//
 		$this->plugin_list = plat_plugin_list_info();
 		$this->contactRetainer = $contactRetainer;
 		$this->tagManager = $tagManager;
 		$this->qrcoder = $qrcode;
+		$this->listenerProvider = $listenerProvider;
+		//
+		$this->listenerProvider->addListener(
+			ContactAddEvent::class, new ContactAddListener()
+		);
 	}
 
 	public function home()
@@ -156,7 +167,13 @@ class ContactBookServlet extends HttpServlet
 	public function create(
 		string $name, FileUploadRequest $upload, $contact_type = 1
 	) {
-		$this->contactRetainer->createContact($name, $contact_type, $upload);
+		$person = $this->contactRetainer->createContact(
+			$name, $contact_type, $upload
+		);
+		//
+		EventDispatcher::to($this->listenerProvider)->dispatch(
+			new ContactAddEvent($person)
+		);
 		//
 		$this->session->flash(
 			'message',

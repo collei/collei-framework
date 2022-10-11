@@ -67,6 +67,8 @@ class SiteManagerServlet extends AdminServlet
 			'servlets' => $this->engine->listServlets($engine),
 			'services' => $this->engine->listServices($engine),
 			'filters' => $this->engine->listFilters($engine),
+			'events' => $this->engine->listEvents($engine),
+			'listeners' => $this->engine->listListeners($engine),
 			'commands' => $this->engine->listCommands($engine),
 		];
 		//
@@ -78,7 +80,16 @@ class SiteManagerServlet extends AdminServlet
 
 	public function engineAddFile($engine, $element, $classname)
 	{
-		$this->engine->createFile($classname, $engine, $element);
+		if ($element == 'listeners') {
+			$eventName = $this->request->eventclassname;
+			//
+			$this->engine->createFile($classname, $engine, 'listeners', [
+				'eventClassName' => $eventName
+			]);
+			$this->engine->createFile($eventName, $engine, 'events');
+		} else {
+			$this->engine->createFile($eventName, $engine, $element);
+		}
 		//
 		redirect(
 			route('plat-adm-site-engine-view', ['engine' => $engine])
