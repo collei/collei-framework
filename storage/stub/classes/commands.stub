@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Commands;
 
 use Collei\Console\CommandLine;

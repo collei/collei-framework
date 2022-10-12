@@ -23,6 +23,17 @@
 				</div>
 
 				<div>
+					<p><b>lista de clientes</b></p>
+					<ul>
+					@forelse ($clientes as $cliente)
+						<li>{{ $cliente }}</li>
+					@empty
+						<p>Nenhum cliente agora.</p>
+					@endforelse
+					</ul>
+				</div>
+
+				<div>
 					<pre>
 {{ print_r([$storag, $congelado ?? 'NO!'], true) }}
 					</pre>

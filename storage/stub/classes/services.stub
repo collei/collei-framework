@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use Collei\Services\Service;

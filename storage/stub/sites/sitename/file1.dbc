@@ -1,0 +1,9 @@
+[db]
+driver=mysql
+database=__DBNAME__
+server=__DBSERVER__
+port=3306
+charset=UTF-8
+user=__DBUSER__
+pass=__DBPASSWORD__
+dsn=sqlsrv:UID={db.user};PWD={db.pass};Server={db.server};Database={db.database}

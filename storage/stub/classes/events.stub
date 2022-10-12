@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Events;
 
 use Collei\Events\EventInterface;

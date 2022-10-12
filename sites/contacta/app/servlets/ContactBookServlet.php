@@ -93,6 +93,7 @@ class ContactBookServlet extends HttpServlet
 				'pasta_dentro' => $pasta_dentro,
 			],
 			'qrcodeuri' => $qrcode->getDataUri(),
+			'clientes' => ['Washington','Wellington','Wesley','Franz'],
 		]);
 	}
 

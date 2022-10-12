@@ -1,0 +1,35 @@
+;
+;	name and title of site
+;
+name sitename
+title "Name of My Site"
+
+;
+;	creates directory tree
+;
+dir /app/commands
+dir /app/events
+dir /app/filters
+dir /app/listeners
+dir /app/models
+dir /app/services
+dir /app/servlets
+dir /resources/views
+dir /resources/css
+dir /resources/js
+dir /resources/media
+dir /resources/files
+dir /storage/files
+
+;
+;	copies files to destination
+;
+file /.dbc :file1.dbc
+file /database.php :database.php
+file /route.php :route.php
+file /resources/views/index.vis.php :index.vis.php
+
+;
+;	redirects to the new created site
+;
+test sitename

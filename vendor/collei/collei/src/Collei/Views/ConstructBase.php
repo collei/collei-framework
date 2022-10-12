@@ -154,6 +154,28 @@ class ConstructBase
 		],
 
 		[
+			'name'			=> 'forelse',
+			'regex'			=> self::CONSTRUCT_PREFIX_REGEX . 'forelse(\s*\(\s*(.+)\s*as\s*(\$\w+\s*=>\s*)?\$\w+\s*\))',
+			'incomplete'	=> self::CONSTRUCT_PREFIX_REGEX . 'forelse(.*)',
+			'placement'		=> '<?php if (!empty($2)) { foreach $1 { ?>',
+			'auto-replace'	=> true
+		],
+
+		[
+			'name'			=> 'empty',
+			'regex'			=> self::CONSTRUCT_PREFIX_REGEX . 'empty',
+			'placement'		=> '<?php } } else { ?>',
+			'auto-replace'	=> true
+		],
+
+		[
+			'name'			=> 'endforelse',
+			'regex'			=> self::CONSTRUCT_PREFIX_REGEX . 'endforelse',
+			'placement'		=> self::CONSTRUCT_SNIPPET_END,
+			'auto-replace'	=> true
+		],
+
+		[
 			'name'			=> 'inject',
 			'regex'			=> self::CONSTRUCT_PREFIX_REGEX . 'inject(\(\s*\'\s*(\w+)\s*\'\s*(,\s*(\'[^\']*\')\s*(,\s*.*\s*)*)?\s*\))',
 			'incomplete'	=> self::CONSTRUCT_PREFIX_REGEX . 'inject(.*)',
