@@ -1,10 +1,11 @@
 <?php
 namespace Collei\App\Loaders;
 
-require_once dirname(__FILE__) . '/LoggerTrait.php';
+require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/Utils/Logging/LogFileTrait.php';
+
 
 use Collei\Utils\Values\Value;
-use Collei\App\Loaders\LoggerTrait;
+use Collei\Utils\Logging\LogFileTrait;
 use ReflectionClass;
 use ReflectionMethod;
 use Exception;
@@ -18,7 +19,7 @@ use BadMethodCallException;
  */
 class ClassLoader 
 {
-	use LoggerTrait;
+	use LogFileTrait;
 
 	/**
 	 *	@static

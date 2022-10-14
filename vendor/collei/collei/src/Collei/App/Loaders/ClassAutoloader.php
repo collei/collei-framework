@@ -1,13 +1,13 @@
 <?php
 namespace Collei\App\Loaders;
 
-require_once dirname(__FILE__) . '/LoggerTrait.php';
+require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/Utils/Logging/LogFileTrait.php';
 require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/App/Environment.php';
 
 use Collei\App\Environment;
 use Collei\App\App;
 use Collei\App\Loaders\ClassLoader;
-use Collei\App\Loaders\LoggerTrait;
+use Collei\Utils\Logging\LogFileTrait;
 use DateTime;
 
 /**
@@ -18,7 +18,7 @@ use DateTime;
  */
 class ClassAutoloader
 {
-	use LoggerTrait;
+	use LogFileTrait;
 
 	/**
 	 *	@static

@@ -22,6 +22,100 @@ use Collei\Geometry\Point;
 use Collei\Geometry\Rect;
 use Collei\Console\Output\Rich\Formatter;
 
+use Collei\System\Sockets\Socket;
+
+
+function socketWriteTo(string $addr, int $port, string $content)
+{
+	$length = strlen($content);
+	$socket = \socket_create(AF_INET, SOCK_STREAM, 0);
+	\socket_connect($socket, $addr, $port);
+	//
+	while (true) {
+		$sent = \socket_send($socket, $content."\r\n", $length + strlen("\r\n"), 0);
+		//
+		if ($sent === false) {
+			break;
+		}
+		// Check if the entire message has been sented
+		if ($sent < $length) {
+			// If not sent the entire message.
+			// Get the part of the message that has not yet been sented as message
+			$content = substr($content, $sent);
+			// Get the length of the not sented part
+			$length -= $sent;
+		} else {
+			break;
+		}
+	}
+	//
+	\socket_close($socket);
+}
+
+Cyno::command('shout {message} {port=2999} {addr=127.0.1.1}', function(){
+	$address = $this->argument('addr');
+	$port = (int)$this->argument('port');
+	$message = $this->argument('message');
+
+	socketWriteTo($address, $port, $message);
+});
+
+Cyno::command('listen2 {port=2999} {addr=127.0.1.1}', function(){
+	$address = $this->argument('addr');
+	$port = (int)$this->argument('port');
+	$soc = (new Socket(AF_INET, SOCK_STREAM, 0))
+		->bind($address, $port)
+		->listen();
+	//
+	while (true) {
+		if ($client = $soc->accept()) {
+			$input = '';
+			$client->read($input);
+			//
+			$this->write("rcvd: <fg=yellow>$input</>\r\n");
+			//
+			if (trim($input) == 'exit') {
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+});
+
+Cyno::command('listen {port=2999} {addr=127.0.1.1}', function(){
+	set_time_limit (0);
+
+	$address = $this->argument('addr');
+
+	$port = (int)$this->argument('port');
+	$con = 1;
+	$word = "";
+
+	$sock = \socket_create(AF_INET, SOCK_STREAM, 0);
+	$bind = \socket_bind($sock, $address, $port);
+
+	\socket_listen($sock);
+
+	while ($con == 1) {
+		$client = \socket_accept($sock);
+		$input = trim(\socket_read($client, 1024));
+		//
+		if ($input == 'exit') {
+			$close = \socket_close($sock);
+			$con = 0;
+		}
+		//
+		if($con == 1) {
+			$this->write("rcvd: <fg=yellow>$input</>\r\n");
+			$word .= $input . "\r\n";
+		}
+	}
+	//
+	$this->write("historial:\r\n <fg=cyan>$word</>\r\n");;
+});
+
+
 
 
 Cyno::command('tinker', function(){
@@ -195,7 +289,7 @@ Cyno::command('liscom {what?}', function(){
 	$cols = [25, 25, 25];
 	//
 	while (!empty($items)) {
-		$line = "    ";
+		$line = "	";
 		foreach ($cols as $col) {
 			if ($text = \array_shift($items)) {
 				$line .= Str::pad($text, $col);

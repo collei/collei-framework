@@ -1,5 +1,5 @@
 <?php
-namespace Collei\App\Loaders;
+namespace Collei\Utils\Logging;
 
 use DateTime;
 
@@ -9,7 +9,7 @@ use DateTime;
  *	@author alarido <alarido.su@gmail.com>
  *	@since 2022-10-09
  */
-trait LoggerTrait
+trait LogFileTrait
 {
 	/**
 	 *	Logs autold issues
