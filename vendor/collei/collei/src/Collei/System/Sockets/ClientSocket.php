@@ -4,7 +4,7 @@ namespace Collei\System\Sockets;
 use Collei\System\Sockets\AbstractSocket;
 
 /**
- *	Encapsulates a socket
+ *	Encapsulates a client socket
  *
  *	@author alarido <alarido.su@gmail.com>
  *	@since 2022-10-13

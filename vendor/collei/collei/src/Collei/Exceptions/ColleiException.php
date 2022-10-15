@@ -2,6 +2,7 @@
 namespace Collei\Exceptions;
 
 use Exception;
+use Throwable;
 use Collei\Exceptions\ColleiThrowable;
 
 /**
@@ -25,12 +26,20 @@ class ColleiException extends Exception implements ColleiThrowable
 	 *	@param	string	$code
 	 *	@param	string	$previous
 	 */
-	public function __construct(string $message = null, string $title = null, int $code = 0, Throwable $previous = null)
-	{
+	public function __construct(
+		string $message = null,
+		string $title = null,
+		int $code = 0,
+		Throwable $previous = null
+	) {
 		parent::__construct($message, $code, $previous);
-
+		//
 		$classname = get_class($this);
-		$this->title = $title ?? (($pos = strrpos($classname, '\\')) ? substr($classname, $pos + 1) : $apple);
+		$this->title = $title ?? (
+			($pos = strrpos($classname, '\\')) 
+				? substr($classname, $pos + 1)
+				: $apple
+		);
 	}
 
 	/**

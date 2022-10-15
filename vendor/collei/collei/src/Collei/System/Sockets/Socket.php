@@ -32,7 +32,27 @@ class Socket extends AbstractSocket
 	 *	@var array $connectionInfo
 	 */
 	private $connectionInfo = [];
-	
+
+	/**
+	 *	Retrieves whether this socket is bound.
+	 *
+	 *	@return	bool
+	 */
+	public function isBound()
+	{
+		return $this->bound;
+	}
+
+	/**
+	 *	Retrieves whether this socket is connected.
+	 *
+	 *	@return	bool
+	 */
+	public function isConnected()
+	{
+		return $this->connected;
+	}
+
 	/**
 	 *	Initializes a socket. Same parameters as of socket_create().
 	 *
@@ -54,11 +74,13 @@ class Socket extends AbstractSocket
 		if ($sock = @socket_create($domain, $type, $protocol)) {
 			$this->setSock($sock);
 		} else {
-			$this->logError(socket_last_error(), [
-				'description' => 'Could not create socket for.',
-				'domain' => $domain,
-				'type' => $type,
-				'protocol' => $protocol,
+			$this->logError(new SocketException(
+					'Could not create socket for.',
+					socket_last_error()
+				), [
+					'domain' => $domain,
+					'type' => $type,
+					'protocol' => $protocol
 			]);
 		}
 	}
@@ -74,11 +96,12 @@ class Socket extends AbstractSocket
 	public function bind(string $address, int $port = 0)
 	{
 		if ($this->bound) {
-			$this->logError(-1, [
-				'reason' => 'Socket already in use.',
-				'description' => 'Socket already bound to.',
-				'address' => $address,
-				'port' => $port
+			$this->logError(new SocketBindException(
+					'Socket already in use',
+					socket_last_error()
+				), [
+					'address' => $address,
+					'port' => $port
 			]);
 		} else {
 			$this->bound = @socket_bind($this->getSock(), $address, $port);
@@ -89,10 +112,12 @@ class Socket extends AbstractSocket
 			];
 			//
 			if (!$this->bound) {
-				$this->logError(socket_last_error(), [
-					'description' => 'Could not bind socket to.',
-					'address' => $address,
-					'port' => $port,
+				$this->logError(new SocketBindException(
+						'Could not bind socket to.',
+						socket_last_error()
+					), [
+						'address' => $address,
+						'port' => $port
 				]);
 			}
 		}
@@ -116,40 +141,44 @@ class Socket extends AbstractSocket
 			return $this;
 		}
 		//
-		if (!$this->bound) {
+		if (!$this->isBound()) {
 			if (is_null($address) || is_null($port)) {
-				$this->logError(-1, [
-					'reason' => 'Empty or invalid address/port',
-					'description' => (
-						'Provide address/port info or call the method bind() '
-						. 'before connect()\'ing.'
-					),
-					'address' => $address,
-					'port' => $port
+				$this->logError(new SocketConnectionException(
+						'Empty or invalid address/port.',
+						socket_last_error()
+					), [
+						'address' => $address,
+						'port' => $port
 				]);
 			} else {
 				$this->bind($address, $port);
 			}
 		}
 		//
-		if ($this->bound) {
+		if ($this->isBound()) {
 			$this->connectionInfo = [
-				'address' => $address,
-				'port' => $port,
+				'address' => ($address ?? $this->bindInfo['address']),
+				'port' => ($port ?? $this->bindInfo['port']),
 				'timestamp' => new DateTime()
 			];
-			$this->connected = socket_connect($this->getSock(), $address, $port);
+			$this->connected = socket_connect(
+				$this->getSock(),
+				($address ?? $this->bindInfo['address']),
+				($port ?? $this->bindInfo['port'])
+			);
 		}
 		//
 		if (!$this->connected) {
-			$this->logError(socket_last_error(), [
-				'description' => 'Could not connect to.',
-				'address' => (
-					$this->connectionInfo['address'] ?? $address ?? '(none)'
-				),
-				'port' => (
-					$this->connectionInfo['port'] ?? $port ?? '(none)'
-				),
+			$this->logError(new SocketConnectionException(
+					'Could not connect to.',
+					socket_last_error()
+				), [
+					'address' => (
+						$this->connectionInfo['address'] ?? $address ?? '(none)'
+					),
+					'port' => (
+						$this->connectionInfo['port'] ?? $port ?? '(none)'
+					)
 			]);
 		}
 		//
@@ -163,15 +192,20 @@ class Socket extends AbstractSocket
 	 *	@param	int		$maxConnections = 0
 	 *	@return	this
 	 */
-	public function listen(int $maxConnections = 0)
+	public function listen(int $maxConnections = null)
 	{
-		if ($this->bound) {
-			socket_listen($this->getSock(), $maxConnections);
+		if ($this->isBound()) {
+			if (!is_null($maxConnections)) {
+				socket_listen($this->getSock(), $maxConnections);
+			} else {
+				socket_listen($this->getSock());
+			}
 		} else {
-			$this->logError(-1, [
-				'reason' => 'Socket must be bind before listen',
-				'description' => 'Call method bind() before listen()\'ing.'
-			]);
+			$this->logError(
+				new SocketConnectionException(
+					'Could not connect to.', -1
+				)
+			);
 		}
 		//
 		return $this;

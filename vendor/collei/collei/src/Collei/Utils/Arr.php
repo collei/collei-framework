@@ -547,6 +547,12 @@ abstract class Arr
 		return $result;
 	}
 
+
+	public static function toDescription(array $assoc)
+	{
+		
+	}
+
 }
 
 

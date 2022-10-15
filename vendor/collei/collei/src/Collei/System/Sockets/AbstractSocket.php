@@ -68,46 +68,87 @@ abstract class AbstractSocket
 	private $exceptionMode = true;
 
 	/**
+	 *	Extracts reason from provided details, if any.
+	 *
+	 *	@static
+	 *	@param	array	$details = null
+	 *	@param	string	$alternative = null
+	 *	@return	string
+	 */
+	private static function reasonFromDetails(
+		int $errorNumber, array $details = null, string $alternative = null
+	) {
+		$reason = 'Unknown reason';
+		//
+		if (0 > $errorNumber) {
+			$reason = $details['reason'] ?? $details['description'] ?? '';
+			$reason .= (!empty($reason))
+				? (': ' . ($details['description'] ?? ''))
+				: ($details['description'] ?? $alternative ?? 'Unknown reason');
+			//
+			if (': ' === substr($reason, -2)) {
+				$reason = substr($reason, 0, -2);
+			}
+		} else {
+			$reason = socket_strerror($errorNumber);
+		}
+		//
+		socket_clear_error();
+		//
+		return $reason;
+	}
+
+	/**
 	 *	Logs socket errors.
 	 *
 	 *	@param	int		$errNumber
 	 *	@param	array	$details = null
 	 *	@return	void
 	 */
-	protected function logError(int $errNumber, array $details = null)
+	protected function logErrorSilently(int $errNumber, array $details = null)
 	{
-		$errReason = socket_strerror($errNumber);
+		$errReason = self::reasonFromDetails(
+			$errNumber, $details, 'Unknown reason'
+		);
 		//
-		if (-1 === $errNumber) {
-			$errReason = $details['reason']
-				?? $details['description']
-				?? '';
-			$errReason .= (!empty($errReason))
-				? (': ' . ($details['description'] ?? ''))
-				: ($details['description'] ?? 'Unknown reason.');
-			//
-			if (': ' === substr($errReason, -2)) {
-				$errReason = substr($errReason, 0, -2);
-			}
-		}
-		//
-		if (is_empty($details)) {
-			$details = [
-				'error' => "$errNumber $errReason."
-			];
+		if (empty($details)) {
+			$details = array('error' => "$errNumber $errReason.");
 		} else {
 			$details['error'] = "$errNumber $errReason.";
-			$errReason .= ". \r\nDetails: " . print_r($details, true);
 		}
 		//
-		socket_clear_error();
+		$errReason .= ". \r\nDetails: " . print_r($details, true);
+		//
+		$this->log(
+			$errNumber, 'socket error', "Socket error $errNumber: $errReason."
+		);
+	}
+	
+	/**
+	 *	Logs socket errors OR raises an Exception.
+	 *
+	 *	@param	int		$errNumber
+	 *	@param	array	$details = null
+	 *	@return	void
+	 */
+	protected function logError(
+		SocketException $exception, array $details = null
+	) {
+		$code = $exception->getCode();
+		$message = $exception->getMessage();
 		//
 		if ($this->exceptionMode) {
+			$reason = ($code < 0) ? '' : socket_strerror($code);
+			//
+			if (!empty($details)) {
+				$message .= (" \r\nDetails: " . print_r($details, true));
+			}
+			//
 			throw new SocketException(
-				"Socket error $errNumber: $errReason.", $errNumber
+				"Socket error $code: $reason.", $code, $exception
 			);
 		} else {
-			$this->log($errNumber, 'socket error', $errReason);
+			$this->logErrorSilently($code, $details);
 		}
 	}
 
@@ -165,9 +206,11 @@ abstract class AbstractSocket
 	public function setBlock()
 	{
 		if (!socket_set_block($this->sock)) {
-			$this->logError(socket_last_error(), [
-				'description' => 'Could not set block mode for socket.',
-				'socket' => $this->sock
+			$this->logError(new SocketException(
+					'Could not set block mode for socket.',
+					socket_last_error()
+				), [
+					'socket' => $this->sock
 			]);
 		} else {
 			$this->blockingMode = true;
@@ -184,9 +227,11 @@ abstract class AbstractSocket
 	public function setNonBlock()
 	{
 		if (!socket_set_nonblock($this->sock)) {
-			$this->logError(socket_last_error(), [
-				'description' => 'Could not set nonblock mode for socket.',
-				'socket' => $this->sock
+			$this->logError(new SocketException(
+					'Could not set nonblock mode for socket.',
+					socket_last_error()
+				), [
+					'socket' => $this->sock
 			]);
 		} else {
 			$this->blockingMode = false;
@@ -226,9 +271,11 @@ abstract class AbstractSocket
 			$bytes = @socket_recv($this->sock, $data, 1024, 0);
 			//
 			if (false === $bytes) {
-				$this->logErrorSilently(socket_last_error(), [
-					'description' => 'Could not read from socket.',
-					'socket' => $this->sock
+				$this->logError(new SocketReadException(
+						'Could not read from socket.',
+						socket_last_error()
+					), [
+						'socket' => $this->sock
 				]);
 				//
 				return false;
@@ -278,19 +325,21 @@ abstract class AbstractSocket
 			);
 			//
 			if ($sent === false) {
-				$this->logError(socket_last_error(), [
-					'description' => 'Could not write to socket.',
-					'socket' => $this->sock
+				$this->logError(new SocketWriteException(
+						'Could not write to socket.',
+						socket_last_error()
+					), [
+						'socket' => $this->sock
 				]);
 				//
 				return false;
 			}
-			// Check if the entire message has been sented
+			// Check if the entire message has been sent
 			if ($sent < $length) {
 				// If not sent the entire message.
-				// Get the part of the message that has not yet been sented as message
+				// Get the part of the message that has not yet been sent as message
 				$content = substr($content, $sent);
-				// Get the length of the not sented part
+				// Get the length of the not sent part
 				$length -= $sent;
 				// Calculates the total bytes sent
 				$totalSent += $sent;
