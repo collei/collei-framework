@@ -126,47 +126,25 @@ class Socket extends AbstractSocket
 	}
 
 	/**
-	 *	Connects it. Same parameters as of socket_connect() and
-	 *	it will call socket_bind() if needed.
-	 *	Parameters are optional if method bind() was previously called;
-	 *	otherwise you MUST provide them. 
+	 *	Connects it. Same parameters as of socket_connect().
 	 *
-	 *	@param	string	$address = null
-	 *	@param	int		$port = null
+	 *	@param	string	$address
+	 *	@param	int		$port = 0
 	 *	@return	this
 	 */
-	public function connect(string $address = null, int $port = null)
+	public function connect(string $address, int $port = 0)
 	{
 		if ($this->connected) {
 			return $this;
 		}
 		//
-		if (!$this->isBound()) {
-			if (is_null($address) || is_null($port)) {
-				$this->logError(new SocketConnectionException(
-						'Empty or invalid address/port.',
-						socket_last_error()
-					), [
-						'address' => $address,
-						'port' => $port
-				]);
-			} else {
-				$this->bind($address, $port);
-			}
-		}
+		$this->connectionInfo = [
+			'address' => $address,
+			'port' => $port,
+			'timestamp' => new DateTime()
+		];
 		//
-		if ($this->isBound()) {
-			$this->connectionInfo = [
-				'address' => ($address ?? $this->bindInfo['address']),
-				'port' => ($port ?? $this->bindInfo['port']),
-				'timestamp' => new DateTime()
-			];
-			$this->connected = socket_connect(
-				$this->getSock(),
-				($address ?? $this->bindInfo['address']),
-				($port ?? $this->bindInfo['port'])
-			);
-		}
+		$this->connected = @socket_connect($this->getSock(), $address, $port);
 		//
 		if (!$this->connected) {
 			$this->logError(new SocketConnectionException(
@@ -203,7 +181,7 @@ class Socket extends AbstractSocket
 		} else {
 			$this->logError(
 				new SocketConnectionException(
-					'Could not connect to.', -1
+					'Could not listen to unbound. Please bind() it first!', -1
 				)
 			);
 		}

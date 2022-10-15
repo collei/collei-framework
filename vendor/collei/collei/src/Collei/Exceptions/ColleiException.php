@@ -43,6 +43,41 @@ class ColleiException extends Exception implements ColleiThrowable
 	}
 
 	/**
+	 *	returns a clone of this exception instance.
+	 *
+	 *	@return	clone this
+	 */
+	public function clone()
+	{
+		return unserialize(serialize($this));
+	}
+
+	/**
+	 *	Appends the $addition to the message.
+	 *
+	 *	@return	this
+	 */
+	public function appendMessage(string $addition)
+	{
+		$this->message .= (' ' . $addition);
+		//
+		return $this;
+	}
+
+	/**
+	 *	Clones this exception instance, appends the message to such clone
+	 *	and returns it 
+	 *
+	 *	@return	clone this
+	 */
+	public function cloneAndAppendToMessage(string $addition)
+	{
+		$cloned = $this->clone();
+		$cloned->appendMessage($addition);
+		return $cloned;
+	}
+
+	/**
 	 *	Returns the exception title
 	 *
 	 *	@return	string

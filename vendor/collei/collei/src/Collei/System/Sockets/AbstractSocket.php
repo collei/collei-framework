@@ -135,18 +135,15 @@ abstract class AbstractSocket
 		SocketException $exception, array $details = null
 	) {
 		$code = $exception->getCode();
-		$message = $exception->getMessage();
 		//
 		if ($this->exceptionMode) {
 			$reason = ($code < 0) ? '' : socket_strerror($code);
 			//
 			if (!empty($details)) {
-				$message .= (" \r\nDetails: " . print_r($details, true));
+				$reason .= (" \r\nDetails: " . print_r($details, true));
 			}
 			//
-			throw new SocketException(
-				"Socket error $code: $reason.", $code, $exception
-			);
+			throw $exception->cloneAndAppendToMessage($reason);
 		} else {
 			$this->logErrorSilently($code, $details);
 		}
@@ -189,13 +186,15 @@ abstract class AbstractSocket
 	 */
 	public function __destruct()
 	{
-		$linger = array(
-			'l_linger' => 0,
-			'l_onoff' => 1
-		);
-		//
-		socket_set_option($this->sock, SOL_SOCKET, SO_LINGER, $linger);
-		socket_close($this->sock);
+		if (!is_null($this->sock)) {
+			$linger = array(
+				'l_linger' => 0,
+				'l_onoff' => 1
+			);
+			//
+			@socket_set_option($this->sock, SOL_SOCKET, SO_LINGER, $linger);
+			@socket_close($this->sock);
+		}
 	}
 
 	/**
@@ -324,7 +323,7 @@ abstract class AbstractSocket
 				$this->sock, "$content\r\n", ($length + $nllength), 0
 			);
 			//
-			if ($sent === false) {
+			if (false === $sent) {
 				$this->logError(new SocketWriteException(
 						'Could not write to socket.',
 						socket_last_error()
@@ -350,6 +349,19 @@ abstract class AbstractSocket
 		//
 		return $totalSent;
 	}
+
+	/**
+	 *	Closes the socket.
+	 *
+	 *	@return	void
+	 */
+	public function close()
+	{
+		@socket_close($this->sock);
+		//
+		$this->sock = null;
+	}
+
 
 
 }

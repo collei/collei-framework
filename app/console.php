@@ -25,16 +25,14 @@ use Collei\Console\Output\Rich\Formatter;
 use Collei\System\Sockets\Socket;
 use Collei\System\Sockets\TinyServerSocket;
 
-
 Cyno::command('shout {message} {port=2999} {addr=127.0.1.1}', function(){
 	$address = $this->argument('addr');
 	$port = (int)$this->argument('port');
 	$message = $this->argument('message');
 	//
-	(new Socket(AF_INET, SOCK_STREAM, 0))
-		->bind($address, $port)
-		->connect()
-		->write($message);
+	$soc = (new Socket(AF_INET, SOCK_STREAM, 0))->connect($address, $port);
+	$soc->write($message);
+	$soc->close();
 });
 
 Cyno::command('listen {port=2999} {addr=127.0.1.1}', function(){
@@ -44,11 +42,15 @@ Cyno::command('listen {port=2999} {addr=127.0.1.1}', function(){
 		->bind($address, $port)
 		->loop(function($client){
 			$input = '';
-			$client->read($input);
 			//
-			$this->write("<fg=lime>rcvd2:</> <fg=yellow>$input</>\r\n");
-			//
-			return (trim($input) === 'exit');
+			if ($client->read($input) !== false) {
+				$this->write("<fg=lime>rcvd2:</> <fg=yellow>$input</>\r\n");
+				//
+				return (trim($input) === 'exit');
+			} else {
+				echo "\r\nnoreadingcoz ???";
+				return true;
+			}
 		});
 });
 

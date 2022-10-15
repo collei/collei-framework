@@ -547,10 +547,32 @@ abstract class Arr
 		return $result;
 	}
 
-
-	public static function toDescription(array $assoc)
+	/**
+	 *	Converts an associative array to a description of labeled values, i.e.:
+	 *		['star'=>'sun', 'planet'=>['name'=>'earth', 'satellites'=>1]]
+	 *	to
+	 *		"star: 'sun', planet: {name: 'earth', satellites: 1}"
+	 *
+	 *	@param	array	$items
+	 *	@return	string
+	 */
+	public static function describe(array $items)
 	{
-		
+		$results = [];
+		//
+		foreach ($items as $n => $item) {
+			if (is_array($item)) {
+				$results[] = "$n: " . self::describe($item); 
+			} elseif (is_object($item)) {
+				$results[] = "$n: instanceof(" . get_class($item) . ')';
+			} elseif (is_string($item)) {
+				$results[] = "$n: '$item'";
+			} else {
+				$results[] = "$n: $item";
+			}
+		}
+		//
+		return '[' . implode(', ', $results) . ']';
 	}
 
 }
