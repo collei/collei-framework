@@ -4,9 +4,13 @@ Inspired on Laravel, Collei Plat aims to support several sites under a single
 domain.
 
 ## How to Use
+
+### Starting dev
 1. Set up a working web server environment (preferably Apache 2.4) with PHP 7.4
 or higher.
-2. Create (or update your existing) .htaccess file and add the following lines:
+2. Clone this repo into a folder into that server.
+3. Run `composer update` and `composer dump-autoloader`. 
+4. Create (or update your existing) .htaccess file and add the following lines:
 ```
 # do not forget turing the engine on
 RewriteEngine on
@@ -14,6 +18,8 @@ RewriteCond %{REQUEST_URI} !-f
 RewriteCond %{REQUEST_URI} !-d
 RewriteRule ^sites(.*)$ /collei-framework/public/index.php [L]
 ```
+
+Now, you are ready to start working on your multi-site.
 
 ### Note on IIS Systems
 Just discovered how to run Collei framework under IIS! You must add these
