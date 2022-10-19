@@ -37,14 +37,10 @@ Developed currently under Apache Web Server 2.4, PHP 8.0.21, Windows 10.
 models, injected services, request filters and, in the future, plugins from
 other contributors.
 * Database support for MySQL 5+ and MS SQL Server
-* Basic plugin management through Packinst 
-(see [collei/packinst](https://github.com/collei/packinst) for details) 
 * Basic authentication structure with support for Google Authentication
 
 ### For the Long Run
 * LDAP-based automatic logon
-* Site Admin Center for site creation, class file management, database profile
-management, and so on
 * Support for Windows Authentication, Microsoft MFA, and possibly custom auth
 mechanisms.
 * Support for running under IIS, nginx and other popular web servers
