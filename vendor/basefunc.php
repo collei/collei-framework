@@ -3,8 +3,8 @@
 define('PLAT_NAME', 'collei');
 define('PLAT_ROOT', '');
 define('PLAT_ROOT_URI', 'sites');
-define('PLAT_FOLDER', basename(dirname(__FILE__, 2)));
-define('PLAT_GROUND', dirname(__FILE__, 2));
+define('PLAT_FOLDER', basename(dirname(__DIR__)));
+define('PLAT_GROUND', dirname(__DIR__));
 define('DIR_SEP', DIRECTORY_SEPARATOR);
 
 define('PLAT_LOGGING', [
@@ -91,22 +91,19 @@ define('PLAT_DATABASE_FILE', 'database.php');
 define('PLAT_FILTER_FILE', 'filter.php');
 define('PLAT_PLUGIN_INIT_FILE', 'init.php');
 
-require_once "../helpers/main.php";
-
+require_once dirname(__DIR__) . '/helpers/main.php';
 
 /*
  *	Defines, if not yet, the standard input stream.
  */
-if (!defined('STDIN'))
-{
+if (!defined('STDIN')) {
 	define('STDIN', fopen('php://stdin', 'r'));
 }
 
 /*
  *	Defines, if not yet, the standard output stream.
  */
-if (!defined('STDOUT'))
-{
+if (!defined('STDOUT')) {
 	define('STDOUT', fopen('php://stdout', 'w'));
 }
 
