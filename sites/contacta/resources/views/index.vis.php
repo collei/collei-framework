@@ -1,7 +1,7 @@
 @extends('layout.generic')
 
 @section('site-content')
-	@inject('dately','Dately\Dately')
+	@inject('carbon','Carbon\Carbon')
 	@inject('storag','Collei\App\Agents\Storage')
 				<div class="col-md-12 justify-content-center">
 					<h1>Contact List</h1>
@@ -14,11 +14,11 @@
 					</ul>
 					<p>For example:</p>
 					<ul>
-						<li>Now's			{{ $dately::now()->format('d/m/Y H:i:s |u|'), }}.
-						<li>Holy Friday's	{{ ($holyFriday = $dately::parse($mydat = '2022-05-02'))->format('d/m/Y') }}.
-						<li>Tá vindo?		{{ ($dately::now()->lt($holyFriday) ? 'sim' : 'não') }}.
-						<li>É Hoje?			{{ ($dately::now()->eq($mydat) ? 'sim' : 'não') }}.
-						<li>Já passou?		{{ ($dately::now()->gt($holyFriday) ? 'sim' : 'não') }}.
+						<li>Now's			{{ $carbon::now()->format('d/m/Y H:i:s |u|'), }}.
+						<li>Holy Friday's	{{ ($holyFriday = $carbon::parse($mydat = '2022-05-02'))->format('d/m/Y') }}.
+						<li>Tá vindo?		{{ ($carbon::now()->lt($holyFriday) ? 'sim' : 'não') }}.
+						<li>É Hoje?			{{ ($carbon::now()->eq($mydat) ? 'sim' : 'não') }}.
+						<li>Já passou?		{{ ($carbon::now()->gt($holyFriday) ? 'sim' : 'não') }}.
 					</ul>
 				</div>
 

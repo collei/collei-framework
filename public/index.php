@@ -6,7 +6,7 @@
  *	provided their namespaced declarations match the
  *	underlying folder structure.
  */
-require_once '../vendor/autold.php';
+require_once '../vendor/autoload.php';
 
 /**
  *	Initializes session support at the very start of idle

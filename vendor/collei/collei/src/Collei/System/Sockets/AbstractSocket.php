@@ -38,6 +38,27 @@ abstract class AbstractSocket
 	}
 
 	/**
+	 *	@static
+	 *	@var bool $forcedClosingMode
+	 */
+	private static $commonForcedClosingMode = false;
+
+	/**
+	 *	Sets forced closing option for further Sockets. It does not affect
+	 *	those created before adjustement. Returns the previous value.
+	 *
+	 *	@param	bool	$value
+	 *	@return	bool
+	 */
+	public static function setForcedClosingMode(bool $value)
+	{
+		$previous = self::$commonForcedClosingMode;
+		self::$commonForcedClosingMode = $value;
+		//
+		return $previous;
+	}
+
+	/**
 	 *	@var \Socket|resource $sock
 	 */
 	private $sock;
@@ -66,6 +87,11 @@ abstract class AbstractSocket
 	 *	@var bool $exceptionMode
 	 */
 	private $exceptionMode = true;
+
+	/**
+	 *	@var bool $forcedClosingMode
+	 */
+	private $forcedClosingMode = false;
 
 	/**
 	 *	Extracts reason from provided details, if any.
@@ -177,6 +203,7 @@ abstract class AbstractSocket
 	protected function __construct()
 	{
 		$this->exceptionMode = self::$commonExceptionMode;
+		$this->forcedClosingMode = self::$commonForcedClosingMode;
 	}
 
 	/**
@@ -187,12 +214,15 @@ abstract class AbstractSocket
 	public function __destruct()
 	{
 		if (!is_null($this->sock)) {
-			$linger = array(
-				'l_linger' => 0,
-				'l_onoff' => 1
-			);
+			if ($this->forcedClosingMode) {
+				$linger = array(
+					'l_linger' => 0,
+					'l_onoff' => 1
+				);
+				//
+				@socket_set_option($this->sock, SOL_SOCKET, SO_LINGER, $linger);
+			}
 			//
-			@socket_set_option($this->sock, SOL_SOCKET, SO_LINGER, $linger);
 			@socket_close($this->sock);
 		}
 	}
@@ -237,6 +267,28 @@ abstract class AbstractSocket
 		}
 		//
 		return $this;
+	}
+
+	/**
+	 *	Sets options.
+	 *
+	 *	@return	this
+	 */
+	public function setOption(int $level, int $optname, $optval = null)
+	{
+		socket_set_option($this->sock, $level, $optname, $optval ?? 0);
+		//
+		return $this;
+	}
+
+	/**
+	 *	Returns the underlying socket as array.
+	 *
+	 *	@return	\Socket|resource
+	 */
+	public function asSocketArray()
+	{
+		return array($this->sock);
 	}
 
 	/**
@@ -346,6 +398,10 @@ abstract class AbstractSocket
 				break;
 			}
 		}
+		//
+		$sent = @socket_send(
+			$this->sock, "\r\n\r\n", strlen("\r\n\r\n"), 0
+		);
 		//
 		return $totalSent;
 	}

@@ -91,6 +91,9 @@ define('PLAT_DATABASE_FILE', 'database.php');
 define('PLAT_FILTER_FILE', 'filter.php');
 define('PLAT_PLUGIN_INIT_FILE', 'init.php');
 
+require_once "../helpers/main.php";
+
+
 /*
  *	Defines, if not yet, the standard input stream.
  */

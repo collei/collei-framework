@@ -161,10 +161,13 @@ abstract class HttpServlet extends Servlet
 	) {
 		if (class_exists($type)) {
 			if (is_a($type, Service::class, true)) {
+logit('new Cresumar("'.__METHOD__ .'")', "service [$type] bound into.");
 				$injector->bind($type, 'make', true);
 			} elseif (is_a($type, Request::class, true)) {
+logit('new Cresumar("'.__METHOD__ .'")', "request [$type] bound into.");
 				$injector->bind($type, 'capture', true);
 			} else {
+logit('new Cresumar("'.__METHOD__ .'")', "any [$type] bound into.");
 				$injector->bind($type);
 			}
 		}

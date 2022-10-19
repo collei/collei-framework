@@ -10,7 +10,6 @@ use Collei\Utils\Str;
 
 use Collei\System\Process;
 
-use App\Commands\PackinstCommander;
 use Collei\Auth\Ldap\Ldap;
 
 use Collei\Utils\Values\TextStream;
@@ -24,6 +23,124 @@ use Collei\Console\Output\Rich\Formatter;
 
 use Collei\System\Sockets\Socket;
 use Collei\System\Sockets\TinyServerSocket;
+
+
+function generateWorkerLocalAddress()
+{
+	static $lastIPAddrInt = 0x7F000002;
+	//
+	do {
+		$next = ++$lastIPAddrInt;
+	} while (($next & 0x000000FF) == 0 || ($next & 0x000000FF) == 255);
+	//
+	return implode('.', [
+		($next & 0x7F000000) >> 24,
+		($next & 0x00FF0000) >> 16,
+		($next & 0x0000FF00) >> 8,
+		($next & 0x000000FF)
+	]);
+}
+
+Cyno::command('lick {alfa=1} {bravo=2} {charlie=3} {delta=4} {echo=5}', function(){
+	$nomes = ['alfa','bravo','charlie','delta','echo'];
+	$jsonitems = [];
+	foreach ($nomes as $nome) {
+		$valor = $this->argument($nome);
+		$jsonitems[] = "\"$nome\": \"$valor\"";
+	}
+	$json = '{' . implode(',', $jsonitems) . '}';
+	//
+	$port = 9876;
+	$message = $json;
+	$this->write("[sent?] $message\r\n");
+	//
+	$soc = (new Socket(AF_INET, SOCK_STREAM, 0))->connect('127.1.0.2', $port);
+	$soc->write("$message\r\n");
+	$soc->close();
+});
+
+
+Cyno::command('licl {port=9876} {msg}', function(){
+	$port = (int)$this->argument('port');
+	$message = $this->argument('msg');
+	$this->write("[sent?] $message\r\n");
+	//
+	$soc = (new Socket(AF_INET, SOCK_STREAM, 0))->connect('127.1.0.2', $port);
+	$soc->write("$message\r\n");
+	$soc->close();
+});
+
+Cyno::command('liserv {port=9876}', function(){
+	$port = (int)$this->argument('port');
+	// create a streaming socket, of type TCP/IP
+	$sock = socket_create(AF_INET, SOCK_STREAM, 0);
+	// set the option to reuse the port
+	socket_set_option($sock, SOL_SOCKET, SO_REUSEADDR, 1);
+	socket_set_nonblock($sock);
+	// "bind" the socket to the address to "localhost", on port $port
+	// so this means that all connections on this port are now our resposibility to send/recv data, disconnect, etc..
+	socket_bind($sock, '127.1.0.2', $port);
+	// start listen for connections
+	socket_listen($sock);
+	// create a list of all the clients that will be connected to us..
+	// add the listening socket to this list
+	$clients = array($sock);
+	//
+	while (true) {
+		// create a copy, so $clients doesn't get modified by socket_select()
+		$read = $clients;
+		$write = $except = NULL;
+		//
+		// notify server monitors
+		$this->write("<fg=blue>[time]</> <fg=cyan>" . date('Y-m-d H:i:s') . "</>\r\n");
+		// get a list of all the clients that have data to be read from
+		// if there are no clients with data, go to next iteration
+		if (socket_select($read, $write, $except, 1) < 1) {
+			continue;
+		}
+		// check if there is a client trying to connect
+		if (in_array($sock, $read)) {
+			// accept the client, and add him to the $clients array
+			$clients[] = $newsock = socket_accept($sock);
+			// send the client a welcome message
+			//socket_write($newsock, "no noobs, but ill make an exception :)\nThere are ".(count($clients) - 1)." client(s) connected to the server\n");
+			socket_getpeername($newsock, $ip);
+			$this->write("<fg=cyan>[info]</> <fg=yellow>New client connected: {$ip}</>\r\n");
+			// remove the listening socket from the clients-with-data array
+			$key = array_search($sock, $read);
+			unset($read[$key]);
+		}
+		// loop through all the clients that have data to read from
+		foreach ($read as $read_sock) {
+			$content = '';
+			$bytes = 0;
+			socket_set_nonblock($read_sock);
+			// reals all data, recursively if needed
+			while (true) {
+				$data = '';
+				$bytes = @socket_recv($read_sock, $data, 1024, 0);
+				$content .= trim($data);
+				// exit loop if no more data
+				if ((0 === $bytes) || (false === $bytes)) {
+					break;
+				}
+			}
+			//
+			// remove client for $clients array
+			$key = array_search($read_sock, $clients);
+			unset($clients[$key]);
+			$this->write("<fg=cyan>[info]</> <fg=yellow>client disconnected.</>\n");
+			// 
+			if (!empty($content)) {
+				$this->write("<fg=blue>[client]</> <fg=white>$content</>\r\n");
+				break;
+			}
+		} // end of reading foreach
+	}
+	// close the listening socket
+	socket_close($sock);
+});
+
 
 Cyno::command('shout {message} {port=2999} {addr=127.0.1.1}', function(){
 	$address = $this->argument('addr');
@@ -55,40 +172,6 @@ Cyno::command('listen {port=2999} {addr=127.0.1.1}', function(){
 });
 
 
-Cyno::command('listen0 {port=2999} {addr=127.0.1.1}', function(){
-	set_time_limit (0);
-
-	$address = $this->argument('addr');
-
-	$port = (int)$this->argument('port');
-	$con = 1;
-	$word = "";
-
-	$sock = \socket_create(AF_INET, SOCK_STREAM, 0);
-	$bind = \socket_bind($sock, $address, $port);
-
-	\socket_listen($sock);
-
-	while ($con == 1) {
-		$client = \socket_accept($sock);
-		$input = trim(\socket_read($client, 1024));
-		//
-		if ($input == 'exit') {
-			$close = \socket_close($sock);
-			$con = 0;
-		}
-		//
-		if($con == 1) {
-			$this->write("rcvd: <fg=yellow>$input</>\r\n");
-			$word .= $input . "\r\n";
-		}
-	}
-	//
-	$this->write("historial:\r\n <fg=cyan>$word</>\r\n");;
-});
-
-
-
 
 Cyno::command('tinker', function(){
 	$expr_full = '';
@@ -111,6 +194,8 @@ Cyno::command('tinker', function(){
 		}
 		$expr_full = 'return ' . $expr_full;
 		//
+		$autoloader = 'require_once PLAT_GROUND . "/vendor/autold.php"; ';
+		eval($autoloader);
 		try {
 			$result = eval($expr_full);
 		} catch (Exception $tr) {
@@ -216,28 +301,6 @@ Cyno::command('testpad {wide=25} {--left} {--center} {--right}', function(){
 });
 
 
-Cyno::command('testream {wide=25} {--wrap}', function(){
-	//
-	$this->write("testando:\r\n\r\n");
-	$wrap = $this->option('wrap');
-	$wide = $this->argument('wide');
-	//
-	$texto = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut non justo vel massa ullamcorper vestibulum. Nulla facilisi. Nam eget nisi et mi laoreet iaculis vel eu tortor. Curabitur euismod turpis at tellus bibendum hendrerit. Phasellus lobortis nec nisl ac tristique. In in lacus eu neque lobortis convallis. Curabitur ut lorem eget nisl egestas bibendum in non turpis. Nulla convallis ornare quam, eget ullamcorper felis posuere at. Maecenas rutrum ultrices arcu, ut egestas massa iaculis a. Praesent vitae consequat lorem. Morbi interdum massa vel enim pretium, nec scelerisque turpis mattis. Pellentesque ac elit vitae diam porta sollicitudin.';
-	//
-	$ts = new TextStream($texto);
-	$i = 1;
-	//
-	while (!$ts->eof()) {
-		$read = $ts->read($wide, $wrap);
-		$slen = strlen($read);
-		echo "\r\n$i\t($slen)\t[" . $read . "]";
-		++$i;
-	}
-	//
-	$this->info("\r\n\r\n");
-});
-
-
 /*
  *	adjust values for everyone
  */
@@ -270,8 +333,6 @@ Cyno::command('liscom {what?}', function(){
 		$this->info($line);
 	}
 	//
-	//Co::writeInRect(40,5,70,9,"Este é um texto longo demais para caber neste quadradinho, mas isto é apenas um teste para tentarmos fazer uma interface legal de programação para escrever no console.");
-	//
 });
 
 
@@ -291,26 +352,6 @@ Cyno::command('gete {varname?}', function(){
 			$this->write("<fg=green>$n</>: <fg=yellow>$v</> \r\n");
 		}
 	}
-	//
-});
-
-
-/*
- *	demonstrates homonyme commands
- */
-Cyno::command('packint {verb?} {repo?}', function(){
-	//
-	$whatdo = $this->argument('verb');
-	$gitrepo = $this->argument('repo');
-	//
-	$this->write(
-		'- I\'ll <fg=yellow>'
-		. $whatdo
-		. '</> the <fg=cyan>'
-		. $gitrepo
-		. '</> to the local project !'
-		. "\r\n\r\n"
-	);
 	//
 });
 
@@ -463,35 +504,6 @@ Cyno::command(
 );
 
 
-Cyno::command('mercado {alfa} {--bravo} {-C|--charlie} {delta : detran} {-e|--echo=*} ', function(){
-	$this->write(".......\r\n<fg=yellow>" . print_r($this, true) . "</>\r\n.......");
-	$this->error('Berrante Dourado');
-});
-
-
-Cyno::command('palestra {pais} {cidades*} {--left} {--right} {--center} {-a|--aeroportos=*}', function(){
-	$inf = [
-		'options' => $this->options(),
-		'arguments' => $this->arguments()
-	];
-	//
-	$this->write(
-		".......\r\n<fg=yellow>" . print_r($inf, true) . "</>\r\n......."
-	);
-});
-
-
-Cyno::command('mail:send {user*} {--log=}', function(){
-	$this->write(
-		".......\r\n<fg=yellow>" . print_r($this, true) . "</>\r\n......."
-	);
-	//
-	echo "\r\nusuarios.count=" . $this->argumentCount('user');
-	echo "\r\nusuarios=" . print_r($this->argument('user'), true);
-	echo "\r\n--log=" . $this->option('log');
-});
-
-
 Cyno::command('moveby {word=HORA}', function(){
 	$word = $this->argument('word') ?? 'heizou';
 	$slen = strlen($word);
@@ -543,8 +555,8 @@ Cyno::command('xadrez {word=HORA}', function(){
 	//
 	$vertes = [10,11,12,13,14,15,16,17];
 	$hores = [5,7,9,11,13,15,17,19];
-	$cores = ['green','red'];
-	$cor = 'green';
+	$cores = ['blue','red'];
+	$cor = 'blue';
 	$either = true;
 	//
 	foreach ($hores as $ho) {
@@ -567,32 +579,6 @@ Cyno::command('xadrez {word=HORA}', function(){
 	Co::clearLine(23);
 	sleep(1);
 });
-
-
-Cyno::command('csp {wait=yes}', function(){
-	$texto = Process::quickRead('mode con');
-	$sttya = Process::quickRead('stty 2>&1');
-	$largo = [];
-	$ansicon = '120x9699 (80x24)';
-	$ansicon2 = '80x24';
-	//
-	preg_match('/--------+\\r?\\n.+?(\\d+)\\r?\\n.+?(\\d+)\\r?\\n/i', $texto, $largo);
-	preg_match('/^(\\d+)x(\\d+)(\\s*\\((\\d+)x(\\d+)\\))?$/', $ansicon, $video);
-	preg_match('/^(\\d+)x(\\d+)(\\s*\\((\\d+)x(\\d+)\\))?$/', $ansicon2, $video2);
-	//
-	$resultados = [
-		'texto' => [$texto, $largo],
-		'ansicon' => [$ansicon, $video],
-		'ansicon2' => [$ansicon2, $video2],
-		'sttya' => [$sttya],
-		'env' => $_ENV,
-	];
-	//
-	echo "\r\n---W-i-n----------------------------\r\n";
-	$this->write('<fg=yellow>' . print_r($resultados, true) . '</>');
-	echo "\r\n------♥----- -----------------------\r\n";
-});
-
 
 Cyno::command('eldap {user=Administrator}', function(){
 	$user = $this->argument('user');

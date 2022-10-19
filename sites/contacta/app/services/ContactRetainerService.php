@@ -16,16 +16,14 @@ class ContactRetainerService extends Service
 
 	public function saveUploaded(FileUploadRequest $upload)
 	{
-		if (!$upload->hasFiles())
-		{
+		if (!$upload->hasFiles()) {
 			return '';
 		}
 
 		$arquivo = $upload->getUploadedFiles()->first();
 		$destino = resourceGround('images/ava');
 
-		if (!$arquivo->moveTo($destino, Str::random(24)))
-		{
+		if (!$arquivo->moveTo($destino, Str::random(24))) {
 			return '';
 		}
 
