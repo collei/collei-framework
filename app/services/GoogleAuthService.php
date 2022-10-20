@@ -48,7 +48,7 @@ class GoogleAuthService extends Service implements AuthConfirmator
 	{
 		$this->timeCreated = new DateTimeImmutable();
 		//
-		$this->goo = new GoogleAuthenticator(6, 10, $this->timeCreated, 300);
+		$this->goo = new GoogleAuthenticator(6, 10, $this->timeCreated, 3600);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class GoogleAuthService extends Service implements AuthConfirmator
 	 */
 	public function verify(string $secret, string $code)
 	{
-		return $this->goo->checkCode($secret, $code, 5);
+		return $this->goo->checkCode($secret, $code, 15);
 	}
 
 }

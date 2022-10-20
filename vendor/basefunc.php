@@ -91,7 +91,7 @@ define('PLAT_DATABASE_FILE', 'database.php');
 define('PLAT_FILTER_FILE', 'filter.php');
 define('PLAT_PLUGIN_INIT_FILE', 'init.php');
 
-require_once dirname(__DIR__) . '/helpers/main.php';
+require_once PLAT_GROUND . '/helpers/main.php';
 
 /*
  *	Defines, if not yet, the standard input stream.
@@ -173,79 +173,47 @@ function html_to_display(...$anything)
 	return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 }
 
+
 /**
- *	Checks for presence of $class_name, returns false if it does not exist.
- *	For the sake of @inject in views, returns true if $class_name is empty
+ *	Helps to identify which functions/methods are really inutile.
+ *	Add right at first line of function:
+ *		return log_unused()
+ *	You can pass the return you  usuallty wait for a ginve function.
+ *	E.g.: write...   		if your function must return...
+ *		log_unused(true)		bool(true)
+ *		log_unused(0)			int
+ *		log_unused(0.0)			float
+ *		log_unused([])			array
+ *		log_unused('')			string
+ *		log_unused(null)		null
+ *		log_unused()			void (no return value)
  *
- *	@param	string	$class_name = null
- *	@return	bool
+ *	@param	mixed	...$returns
+ *	@return	mixed
  */
-function has_class(string $class_name = null)
+function log_unused(...$returns)
 {
-	if (empty($class_name)) {
-		return true;
+	$dbt = debug_backtrace();
+	//
+	$caller = [
+		$dbt[2]['function'] ?? '[NOFUNC]',
+		$dbt[2]['line'] ?? 0,
+		$dbt[2]['file'] ?? '[NOFILE]',
+	];
+	$callee = [
+		$dbt[1]['function'] ?? '[NOFUNC]',
+		$dbt[1]['line'] ?? 0,
+		$dbt[1]['file'] ?? '[NOFILE]',
+	];
+	$log = "\r\n\t\t{$callee[0]}({$callee[1]}) at {$callee[2]}"
+		. "\r\n\t\t\tcalled by {$caller[0]}({$caller[1]}) at {$caller[2]}\r\n";
+	logit(__FUNCTION__, "[UNUSED_NOTICE] $log");
+	//
+	if (count($returns) == 0) {
+		return;
 	}
 	//
-	return \Collei\App\Environment::hasClass($class_name);
-}
-
-/**
- *	Loads site classes manually. For use of \Collei\App\App class.
- *
- *	@param	mixed	$site_name
- *	@param	mixed	$class_name
- *	@return	void
- */
-function require_site_class($site_name, $class_name)
-{
-	return \Collei\App\Loaders\ClassLoader::requireSiteClass(
-		$site_name, $class_name
-	);
-}
-
-/**
- *	Loads Platform manager classes. For use of the \Collei\App\App class.
- *
- *	@param	mixed	$class_name
- *	@return	bool
- */
-function require_manager_class($class_name)
-{
-	return \Collei\App\Loaders\ClassLoader::requireManagerClass(
-		$class_name
-	);
-}
-
-/**
- *	Keeps plugin tracking for the system
- *
- *	@param	string	$pluginName
- *	@param	array	$info
- *	@return	void
- */
-function plat_plugin_register(string $name, array $info)
-{
-	\Collei\App\Environment::registerPlugin($name, $info);
-}
-
-/**
- *	Returns a list of the loaded plugins' names.
- *
- *	@return	array
- */
-function plat_plugin_list()
-{
-	return \Collei\App\Environment::listPlugins();
-}
-
-/**
- *	Returns a list of the loaded plugins and their info.
- *
- *	@return	array
- */
-function plat_plugin_list_info()
-{
-	return \Collei\App\Environment::listPluginsInfo();
+	return $returns[0] ?? null;
 }
 
 /**

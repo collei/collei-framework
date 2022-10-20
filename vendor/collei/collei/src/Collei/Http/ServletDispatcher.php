@@ -38,66 +38,47 @@ class ServletDispatcher
 		$ref_parm_arr = $refMethod->getParameters();
 		$parameters = array();
 		$atomic = ['array','callable','bool','float','int','string'];
-
-		foreach ($ref_parm_arr as $ref_parm)
-		{
+		//
+		foreach ($ref_parm_arr as $ref_parm) {
 			$name = $ref_parm->getName();
 			$type = $ref_parm->getType();
-
-			if (!is_null($type))
-			{
+			//
+			if (!is_null($type)) {
 				$type = $type->getName();
-			}
-			else
-			{
+			} else {
 				$type = '';
 			}
-
-			if ($type === Request::class)
-			{
+			//
+			if ($type === Request::class) {
 				$parameters[$name] = $request;
-			}
-			elseif (!in_array($type, $atomic) && is_subclass_of($type, Request::class))
-			{
-				if ($type === FileUploadRequest::class)
-				{
-					if ($request instanceof FileUploadRequest)
-					{
+			} elseif (
+				!in_array($type, $atomic) && is_subclass_of($type, Request::class)
+			) {
+				if ($type === FileUploadRequest::class) {
+					if ($request instanceof FileUploadRequest) {
 						$parameters[$name] = $request;
-					}
-					else
-					{
+					} else {
 						$parameters[$name] = FileUploadRequest::capture();
 					}
-				}
-				else
-				{
+				} else {
 					$parameters[$name] = $type::capture();
 				}
-			}
-			elseif (!in_array($type, $atomic) && is_subclass_of($type, Service::class))
-			{
+			} elseif (
+				!in_array($type, $atomic) && is_subclass_of($type, Service::class)
+			) {
 				$parameters[$name] = $type::make();
-			}
-			elseif ($name == 'request')
-			{
+			} elseif ($name == 'request') {
 				$parameters['request'] = $request;
-			}
-			elseif ($request->hasParameter($name))
-			{
+			} elseif ($request->hasParameter($name)) {
 				$parameters[$name] = $request->getParameter($name);
-			}
-			elseif ($ref_parm->isOptional())
-			{
+			} elseif ($ref_parm->isOptional()) {
 				$parameters[$name] = $ref_parm->getDefaultValue();
-			}
-			else
-			{
+			} else {
 				$parameters[$name] = null;
 				logerror('Servlet method: mandatory not present', "Missing argument $name of type $type not present in the request ");
 			}
 		}
-
+		//
 		return $parameters;
 	}
 
@@ -111,29 +92,21 @@ class ServletDispatcher
 	 */
 	private function callInstance($instance, $method, $request)
 	{
-		if (!is_null($instance))
-		{
+		if (!is_null($instance)) {
 			$ref_class = new ReflectionClass($instance);
 			$http_method = strtolower($request->method);
-
-			if ($ref_class->hasMethod($method))
-			{
+			//
+			if ($ref_class->hasMethod($method)) {
 				$ref_method = $ref_class->getMethod($method);
 				$parameters = $this->getMethodParameters($ref_method, $request);
-
+				//
 				return $instance->callAction($method, $parameters);
-			}
-			elseif ($ref_class->hasMethod($http_method))
-			{
+			} elseif ($ref_class->hasMethod($http_method)) {
 				return $instance->callAction($http_method, [$request]);
-			}
-			else
-			{
+			} else {
 				return $instance->callAction('handle', [$request]);
 			}
-		}
-		else
-		{
+		} else {
 			return new Response();
 		}
 	}
@@ -147,17 +120,6 @@ class ServletDispatcher
 	 */
 	private function getServletInstance(string $servletClass, Request $request)
 	{
-		$app_site = $this->app->getSite();
-
-		if (!is_null($app_site))
-		{
-			require_site_class($app_site, $servletClass);
-		}
-		else
-		{
-			require_manager_class($servletClass);
-		}
-
 		return $servletClass::make($request);
 	}
 
@@ -182,9 +144,8 @@ class ServletDispatcher
 	{
 		$servlet_class = $route->getServletClass();
 		$servlet_method = $route->getServletMethod();
-
 		$instance = $this->getServletInstance($servlet_class, $request);
-
+		//
 		return $this->callInstance($instance, $servlet_method, $request);
 	}
 

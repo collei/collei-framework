@@ -1,5 +1,4 @@
-(.txt<?php
-(.timgxt<?php
+<?php
 namespace App\Servlets;
 
 use App\Servlets\AdminServlet;

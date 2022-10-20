@@ -60,8 +60,6 @@ class LogonServlet extends HttpServlet
 		}
 		//
 		if ($user->mfaEnabled == true) {
-			//logit(__METHOD__, print_r(['user'=>[$user->id ?? 0,$name,$password],'secret'=>$user->mfaSecret], true));
-			//
 			$this->session->set('mfa_logon', 'user_id', $user->id);
 			$this->session->set('mfa_logon', 'user_secret', $user->mfaSecret);
 			//
@@ -80,8 +78,6 @@ class LogonServlet extends HttpServlet
 		$secret = $this->session->get('mfa_logon', 'user_secret');
 		$code = ($this->request->confirmcode ?? 0);
 		$user = User::fromId($uid);
-		//
-		//logit(__METHOD__, print_r(['user'=>$user ?? 0,'secret'=>$secret,'code'=>$code,'google'=>$this->google], true));
 		//
 		if (!$this->google->verify($secret, $code)) {
 			$this->session->flash('message', 'Invalid code. Please try again.');
