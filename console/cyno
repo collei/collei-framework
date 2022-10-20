@@ -1,6 +1,6 @@
 <?php
 
-require_once '../vendor/autold.php';
+require_once '../vendor/autoload.php';
 
 $app = \Collei\Console\ConsoleApp::start(
 	\Collei\Console\CommandLine::capture()
