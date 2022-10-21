@@ -393,8 +393,7 @@ class ViewRenderer
 		$rendered_source = '';
 		$current_session = Session::capture();
 		//
-		try
-		{
+		try {
 			$everything = array_merge(
 				$variables,
 				$current_session->flashed(),
@@ -406,18 +405,14 @@ class ViewRenderer
 			$parsed_source = " ?>$parsed_source<?php ";
 			eval($parsed_source);
 			$rendered_source = ob_get_clean();
-		}
-		catch (ParseError $pe)
-		{
+		} catch (ParseError $pe) {
 			$msg = 'Detected error: «'. $pe->getMessage()
 				. '» at file ' . $this->view_filename
 				. ', Line ' . $pe->getLine() . '.';
 			$this->logError(
 				$pe, __METHOD__, $msg, $assembled_source, $parsed_source, true
 			);
-		}
-		catch (Throwable $t)
-		{
+		} catch (Throwable $t) {
 			$msg = 'Detected error: «'. $t->getMessage()
 				. '» at Line ' . $t->getLine()
 				. " with Trace: «\r\n" . $t->getTraceAsString()

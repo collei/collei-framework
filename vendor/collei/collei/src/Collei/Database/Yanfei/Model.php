@@ -71,27 +71,24 @@ abstract class Model implements Jsonable
 	 */
 	public final function equals(Model $that = null)
 	{
-		if (is_null($that))
-		{
+		if (is_null($that)) {
 			return false;
 		}
-		if (!($that instanceof static))
-		{
+		//
+		if (!($that instanceof static)) {
 			return false;
 		}
-		if (count($this->attributes) != count($that->attributes))
-		{
+		//
+		if (count($this->attributes) != count($that->attributes)) {
 			return false;
 		}
-
-		foreach ($this->attributes as $n => $v)
-		{
-			if ($v != $that->attributes[$n])
-			{
+		//
+		foreach ($this->attributes as $n => $v) {
+			if ($v != $that->attributes[$n]) {
 				return false;
 			}
 		}
-
+		//
 		return true;
 	}
 
@@ -104,9 +101,8 @@ abstract class Model implements Jsonable
 	{
 		$name = $this->getTable();
 		$table = DS::getTable($name);
-
-		if (!is_null($table))
-		{
+		//
+		if (!is_null($table)) {
 			$this->connection = $table->getDatabase()->getConnection();
 		}
 	}
@@ -129,12 +125,10 @@ abstract class Model implements Jsonable
 	private function entityNameFromModel()
 	{
 		$classname = get_class($this);
-
-		if ($pos = strrpos($classname, '\\'))
-		{
+		if ($pos = strrpos($classname, '\\')) {
 			$classname = substr($classname, $pos + 1);
 		}
-
+		//
 		return Str::toSnake($classname);
 	}
 
@@ -279,12 +273,11 @@ abstract class Model implements Jsonable
 	 */
 	protected final function getAttribute($name)
 	{
-		if (array_key_exists($name, $this->attributes))
-		{
-			if ($this->attributes[$name] instanceof \DateTime)
-			{
+		if (array_key_exists($name, $this->attributes)) {
+			if ($this->attributes[$name] instanceof \DateTime) {
 				return $this->attributes[$name]->format('Y-m-d H:i:s');
 			}
+			//
 			return $this->attributes[$name];
 		}
 	}
@@ -298,40 +291,27 @@ abstract class Model implements Jsonable
 	 */
 	protected final function setAttribute(string $name, $value)
 	{
-		if ($name == $this->getKey())
-		{
+		if ($name == $this->getKey()) {
 			$this->is_new = false;
 		}
 		//
-		if (array_key_exists($name, $this->attributes))
-		{
-			if ($this->attributes[$name] instanceof \DateTime)
-			{
+		if (array_key_exists($name, $this->attributes)) {
+			if ($this->attributes[$name] instanceof \DateTime) {
 				$cal = Date::toDateObject($value);
-
-				if (!is_null($cal))
-				{
+				if (!is_null($cal)) {
 					$this->attributes[$name]
 						->setDate($cal->year, $cal->month, $cal->day)
 						->setTime($cal->hour, $cal->minute, $cal->second);
 				}
-			}
-			elseif ($this->attributes[$name] instanceof Date)
-			{
+			} elseif ($this->attributes[$name] instanceof Date) {
 				$cal = Date::toDateObject($value);
-
-				if (!is_null($cal))
-				{
+				if (!is_null($cal)) {
 					$this->attributes[$name] = $cal;
 				}
-			}
-			else
-			{
+			} else {
 				$this->attributes[$name] = $value;
 			}
-		}
-		else
-		{
+		} else {
 			$this->attributes[$name] = $value;
 		}
 	}
@@ -363,14 +343,14 @@ abstract class Model implements Jsonable
 	 */
 	public function __get($name)
 	{
-		if (method_exists($this, $name))
-		{
-			if (!isset($this->cache[$name]))
-			{
+		if (method_exists($this, $name)) {
+			if (!isset($this->cache[$name])) {
 				$this->cache[$name] = $this->$name();
 			}
+			//
 			return $this->cache[$name];
 		}
+		//
 		return $this->getAttribute($name);
 	}
 
@@ -379,8 +359,7 @@ abstract class Model implements Jsonable
 	 */
 	public function __set($name, $value)
 	{
-		if ($name != $this->getKey())
-		{
+		if ($name != $this->getKey()) {
 			$this->setAttribute($name, $value);
 		}
 	}
@@ -401,22 +380,19 @@ abstract class Model implements Jsonable
 	{
 		$result = [];
 		$id_name = $this->getKey();
-
-		if (!array_key_exists($id_name, $this->attributes))
-		{
+		//
+		if (!array_key_exists($id_name, $this->attributes)) {
 			$result[$id_name] = null;
 		}
-
-		foreach ($this->attributes as $n => $v)
-		{
+		//
+		foreach ($this->attributes as $n => $v) {
 			$result[$n] = $v;
 		}
-
-		foreach ($this->cache as $n => $v)
-		{
+		//
+		foreach ($this->cache as $n => $v) {
 			$result['cached:' . $n] = $v;
 		}
-
+		//
 		return $result;
 	}
 
@@ -472,32 +448,26 @@ abstract class Model implements Jsonable
 			Arr::exceptKeys($model->attributes, [ $key, $timeCreated, $timeUpdated ]),
 			function ($arrayKey) { return Str::toSnake($arrayKey); }
 		);
-
-		if (!$model->isNew() && $model->hasAttribute($key))
-		{
+		//
+		if (!$model->isNew() && $model->hasAttribute($key)) {
 			$updater = DB::update($table);
-
-			foreach ($data as $n => $v)
-			{
+			//
+			foreach ($data as $n => $v) {
 				$updater->set($n, $v);
 			}
-
+			//
 			return $updater->where()
 				->is($key, $model->$key)
 				->execute();
-		}
-		else
-		{
-			if ($model->hasTimestamps())
-			{
+		} else {
+			if ($model->hasTimestamps()) {
 				$data[$model->getUpdatedAt()] = ':updated_at'; 
 			}
-
+			//
 			$model->setAttribute(
-				$key,
-				DB::into($table)->insert($data)->done()
+				$key, DB::into($table)->insert($data)->done()
 			);
-
+			//
 			return $model;
 		}
 	}
@@ -512,16 +482,14 @@ abstract class Model implements Jsonable
 	{
 		$table = $model->getTable();
 		$key = $model->getKey();
-
-		if (!$model->isNew() && $model->hasAttribute($key))
-		{
+		//
+		if (!$model->isNew() && $model->hasAttribute($key)) {
 			$eraser = DB::delete($table);
-
 			return $eraser->where()
 				->is($key, $model->$key)
 				->execute();
 		}
-
+		//
 		return false;
 	}
 
@@ -553,21 +521,17 @@ abstract class Model implements Jsonable
 	protected static function fillModel(array $row)
 	{
 		$piece = null;
-
-		if (static::class !== self::class)
-		{
+		//
+		if (static::class !== self::class) {
 			$piece = new static();
-		}
-		else
-		{
+		} else {
 			$piece = new NullModel();
 		}
-
-		foreach ($row as $n => $v)
-		{
+		//
+		foreach ($row as $n => $v) {
 			$piece->setAttribute(Str::toCamel($n), $v);
 		}
-
+		//
 		return $piece;
 	}
 
@@ -590,23 +554,19 @@ abstract class Model implements Jsonable
 	 *	@return	\Collei\Database\Yanfei\Model
 	 */
 	protected static function fillModelList(
-		array $rowset,
-		bool $asCollection = false,
+		array $rowset, bool $asCollection = false,
 		string $collectionType = Model::class
-	)
-	{
+	) {
 		$list = [];
-		
-		foreach ($rowset as $row)
-		{
+		//
+		foreach ($rowset as $row) {
 			$list[] = $collectionType::fillModel($row);
 		}
-
-		if ($asCollection)
-		{
+		//
+		if ($asCollection) {
 			return ModelResult::fromTypedArray($list, $collectionType, false);
 		}
-
+		//
 		return $list;
 	}
 
@@ -636,70 +596,59 @@ abstract class Model implements Jsonable
 	{
 		$model = new static();
 		$key = $model->getKey();
-
 		$data = DB::from($model->getTable())
 					->select('*')
 					->where()->is($key, $id)
 					->gather();
-
-		if (!is_null($data))
-		{
-			if (count($data) >= 1)
-			{
+		//
+		if (!is_null($data)) {
+			if (count($data) >= 1) {
 				return static::fillModel($data[0]);
 			}
 		}
-
+		//
 		return null;
 	}
 
 	/**
-	 *	Returns a Model instance - or a collection of Model instances - from specific data 
+	 *	Returns a Model instance - or a collection of Model instances -
+	 *	from specific data 
 	 *
-	 *	@param	mixed	$data	integer index of the record, or query fields to be matched
+	 *	@param	mixed	$data	int index of the record/query fields to be matched
 	 *	@param	int		$rowsPerPage	number of results per page
 	 *	@param	int		$page	which page to query
 	 *	@return	\Collei\Database\Yanfei\Model|\Collei\Database\Yanfei\ModelResult
 	 */
-	public static function from($data, int $rowsPerPage = null, int $page = null)
-	{
-		if (is_int($data) || is_numeric($data))
-		{
+	public static function from(
+		$data, int $rowsPerPage = null, int $page = null
+	) {
+		if (is_int($data) || is_numeric($data)) {
 			return static::fromId((int)(double)$data);
-		}
-		else
-		{
+		} else {
 			$first = true;
 			$query = DB::from(static::askTableName())
 						->select('*')
 						->pageSize($rowsPerPage)
 						->page($page)
 						->where();
-
-			foreach ($data as $n => $v)
-			{
-				if (!$first)
-				{
+			//
+			foreach ($data as $n => $v) {
+				if (!$first) {
 					$query->and();
 				}
 				$query->is($n, $v);
 			}
-
+			//
 			$data = $query->gather();
-
-			if (!is_null($data))
-			{
+			if (!is_null($data)) {
 				$count = count($data);
-				if ($count == 1)
-				{
+				if ($count == 1) {
 					return static::fillModel($data[0]);
-				}
-				elseif ($count > 1)
-				{
+				} elseif ($count > 1) {
 					return static::fillModelList($data, true, static::class);
 				}
 			}
-
+			//
 			return null;
 		}
 	}
@@ -724,7 +673,7 @@ abstract class Model implements Jsonable
 		$info = DB::from(static::askTableName())
 					->select('COUNT(*) AS [numberofrows]')
 					->gather(true);
-
+		//
 		return $info[0]->numberofrows;
 	}
 
@@ -737,14 +686,12 @@ abstract class Model implements Jsonable
 	{
 		$rowCount = static::count();
 		$pageSize = ($pageSize < 1) ? $rowCount : $pageSize;
-
 		$pages = \intdiv($rowCount, $pageSize);
-
-		if (($rowCount % $pageSize) > 0)
-		{
+		//
+		if (($rowCount % $pageSize) > 0) {
 			++$pages;
 		}
-
+		//
 		return $pages;
 	}
 
@@ -759,28 +706,27 @@ abstract class Model implements Jsonable
 	 */
 	public static function all(string ...$orderBy)
 	{
-		$query = DB::from(static::askTableName())
-					->select('*');
-
-		foreach ($orderBy as $ord)
-		{
+		$query = DB::from(static::askTableName())->select('*');
+		//
+		foreach ($orderBy as $ord) {
 			$elements = '';
-
-			if (preg_match('/^(\s*(\w+(\.\w+)*)\s+(asc|desc)\s*)$/i', $ord, $elements))
-			{
+			//
+			if (
+				preg_match('/^(\s*(\w+(\.\w+)*)\s+(asc|desc)\s*)$/i', $ord, $elements)
+			) {
 				$query->orderBy(
 					$elements[2],
 					strtolower($elements[4] ?? '') == 'desc'
 				);
 			}
 		}
-
+		//
 		$query = $query->gather();
-
-		if (!is_null($query))
-		{
+		//
+		if (!is_null($query)) {
 			return self::fillModelList($query, true, static::class);
 		}
+		//
 		return ModelResult::fromEmpty();
 	}
 
@@ -801,33 +747,31 @@ abstract class Model implements Jsonable
 		$page = ($page > 0) ? $page : 1;
 		$rowsPerPage = $rowsPerPage ?? 10;
 		$rowsPerPage = ($rowsPerPage > 0) ? $rowsPerPage : 10;
-
-		//logit(__METHOD__, print_r([$page,$rowsPerPage,$orderBy],true));
-
+		//
 		$query = DB::from(static::askTableName())
 					->select('*')
 					->page($page)
 					->pageSize($rowsPerPage);
-
-		foreach ($orderBy as $ord)
-		{
+		//
+		foreach ($orderBy as $ord) {
 			$elements = '';
-
-			if (preg_match('/^(\s*(\w+(\.\w+)*)\s+(asc|desc)\s*)$/i', $ord, $elements))
-			{
+			//
+			if (
+				preg_match('/^(\s*(\w+(\.\w+)*)\s+(asc|desc)\s*)$/i', $ord, $elements)
+			) {
 				$query->orderBy(
 					$elements[2],
 					strtolower($elements[4] ?? '') == 'desc'
 				);
 			}
 		}
-
+		//
 		$query = $query->gather();
-
-		if (!is_null($query))
-		{
+		//
+		if (!is_null($query)) {
 			return self::fillModelList($query, true, static::class);
 		}
+		//
 		return ModelResult::fromEmpty();
 	}
 
@@ -853,16 +797,15 @@ abstract class Model implements Jsonable
 	 */
 	public static function join($anotherModel, string $ownedKey = null)
 	{
-		if (!is_subclass_of($anotherModel, Model::class))
-		{
+		if (!is_subclass_of($anotherModel, Model::class)) {
 			throw new InvalidArgumentException(
 				$anotherModel . ' is not a subclass of ' . Model::class . '.'
 			);
 		}
-
+		//
 		$atn = static::askTableName();
 		$jtn = $anotherModel::askTableName();
-
+		//
 		return DB::from($atn)
 			->select($atn . '.*')
 			->join($jtn)->on(static::askTableKey(), $ownedKey);
@@ -886,30 +829,24 @@ abstract class Model implements Jsonable
 	public function hasMany(
 		$relatedModelClass,
 		string $foreignKey = null, string $localKey = null
-	)
-	{
-		if (!is_subclass_of($relatedModelClass, Model::class))
-		{
+	) {
+		if (!is_subclass_of($relatedModelClass, Model::class)) {
 			throw new InvalidArgumentException(
 				$relatedModelClass . ' is not a subclass of ' . Model::class . '.'
 			);
 		}
-
-		if (!isset($this->relationCache['has_many'][$relatedModelClass]))
-		{
+		//
+		if (!isset($this->relationCache['has_many'][$relatedModelClass])) {
 			$oneToMany = new OneToMany(
-				$this,
-				new $relatedModelClass,
-				$foreignKey,
-				$localKey
+				$this, new $relatedModelClass, $foreignKey, $localKey
 			);
-
+			//
 			$results = $oneToMany->fetch();
-
+			//
 			$this->relationCache['has_many'][$relatedModelClass] =
 				static::fillModelList($results, true, $relatedModelClass);
 		}
-
+		//
 		return $this->relationCache['has_many'][$relatedModelClass];
 	}
 
@@ -922,23 +859,21 @@ abstract class Model implements Jsonable
 	 */
 	public function belongsTo($relatedModelClass, string $localForeign = null)
 	{
-		if (!is_subclass_of($relatedModelClass, Model::class))
-		{
+		if (!is_subclass_of($relatedModelClass, Model::class)) {
 			throw new InvalidArgumentException(
 				$relatedModelClass . ' is not a subclass of ' . Model::class . '.'
 			);
 		}
-
-		if (!isset($this->relationCache['belongs_to'][$relatedModelClass]))
-		{
+		//
+		if (!isset($this->relationCache['belongs_to'][$relatedModelClass])) {
 			$localForeign = $localForeign ?? ((new $relatedModelClass)->getEntity() . '_id');
 			$localForeign = Str::toCamel($localForeign);
 			$localForeignId = $this->$localForeign;
-
+			//
 			$this->relationCache['belongs_to'][$relatedModelClass] =
 				$relatedModelClass::fromId($localForeignId);
 		}
-
+		//
 		return $this->relationCache['belongs_to'][$relatedModelClass];
 	}
 
@@ -956,16 +891,16 @@ abstract class Model implements Jsonable
 		string $intermediate = null,
 		string $foreignNear = null,
 		string $foreignFar = null
-	){
-		if (!is_subclass_of($relatedModelClass, Model::class))
-		{
+	) {
+		if (!is_subclass_of($relatedModelClass, Model::class)) {
 			throw new InvalidArgumentException(
 				$relatedModelClass . ' is not a subclass of ' . Model::class . '.'
 			);
 		}
-
-		if (!isset($this->relationCache['belongs_to_many'][$relatedModelClass]))
-		{
+		//
+		if (
+			!isset($this->relationCache['belongs_to_many'][$relatedModelClass])
+		) {
 			$manyToMany = new ManyToMany(
 				$this,
 				new $relatedModelClass(),
@@ -973,13 +908,13 @@ abstract class Model implements Jsonable
 				$foreignNear,
 				$foreignFar
 			);
-
+			//
 			$this->relationCache['belongs_to_many'][$relatedModelClass] = 
 				static::fillModelList(
 					$manyToMany->fetch(), true, 	$relatedModelClass
 				);
 		}
-
+		//
 		return $this->relationCache['belongs_to_many'][$relatedModelClass];
 	}
 
@@ -1001,55 +936,39 @@ abstract class Model implements Jsonable
 	public function asJson(string ...$except)
 	{
 		$fields = [];
-
-		foreach ($this->attributes as $n => $v)
-		{
-			if (!in_array($n, $except, true))
-			{
+		//
+		foreach ($this->attributes as $n => $v) {
+			if (!in_array($n, $except, true)) {
 				$fields[$n] = $v;
 			}
 		}
-
+		//
 		$metafields = $this->getRelated();
-
-		foreach ($metafields as $n => $v)
-		{
+		foreach ($metafields as $n => $v) {
 			$proof = $n;
 			$callee = $v;
 			$child = [];
-
-			if (is_numeric($n))
-			{
+			//
+			if (is_numeric($n)) {
 				$proof = $v;
 			}
-
-			if (!in_array($proof, $except, true))
-			{
-				if (method_exists($this, $callee))
-				{
-					$child = $this->{$callee}();
-				}
-				else
-				{
-					$child = $this->$callee;
-				}
-
+			//
+			if (!in_array($proof, $except, true)) {
+				$child = method_exists($this, $callee)
+					? ($this->{$callee}())
+					: ($this->$callee);
+				//
 				$jsonable = (
 					is_subclass_of($child, Model::class) ||
 					is_subclass_of($child, ModelResult::class)
 				);
-
-				if ($jsonable)
-				{
-					$fields[$proof] = json_decode($child->asJson());
-				}
-				else
-				{
-					$fields[$proof] = $child;
-				}
+				//
+				$fields[$proof] = $jsonable
+					? json_decode($child->asJson())
+					: $child;
 			}
 		}
-
+		//
 		return json_encode($fields);
 	}
 
@@ -1063,18 +982,6 @@ abstract class Model implements Jsonable
 		return $this->asJson();
 	}
 
-}
-
-
-
-/**
- *	A dummy Model for comparison
- *
- *	@author alarido <alarido.su@gmail.com>
- *	@since 2021-07-xx
- */
-class NullModel extends Model
-{
 }
 
 

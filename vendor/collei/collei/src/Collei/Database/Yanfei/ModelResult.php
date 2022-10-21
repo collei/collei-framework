@@ -29,18 +29,15 @@ class ModelResult extends TypedCollection
 	 */
 	public function __construct(string $modelClass = null)
 	{
-		if (is_null($modelClass))
-		{
+		if (is_null($modelClass)) {
 			parent::__construct(Model::class);
-		}
-		else
-		{
-			if (is_a($modelClass, Model::class, true) || ($modelClass === Model::class))
-			{
+		} else {
+			if (
+				is_a($modelClass, Model::class, true)
+				|| ($modelClass === Model::class)
+			) {
 				parent::__construct($modelClass);
-			}
-			else
-			{
+			} else {
 				throw new InvalidArgumentException(
 					'Class passed to ModelResult::__construct() is not '
 					. Model::class
@@ -60,19 +57,16 @@ class ModelResult extends TypedCollection
 	public function filter(Closure $each, string $modelClass = null)
 	{
 		$filteredChain = [];
-
-		foreach ($this as $piece)
-		{
+		//
+		foreach ($this as $piece) {
 			$thing = $each($piece);
-
-			if ($thing !== false)
-			{
+			if ($thing !== false) {
 				$filteredChain[] = $thing;
 			}
 		}
-
+		//
 		$modelClass = $modelClass ?? Model::class;
-
+		//
 		return ModelResult::fromTypedArray($filteredChain, $modelClass, false);
 	}
 
@@ -86,28 +80,21 @@ class ModelResult extends TypedCollection
 	{
 		$filteredData = [];
 		$data = '';
-
-		if (!is_null($condition))
-		{
-			foreach ($this as $piece)
-			{
-				if (isset($piece->$fieldName) && $condition($piece))
-				{
+		//
+		if (!is_null($condition)) {
+			foreach ($this as $piece) {
+				if (isset($piece->$fieldName) && $condition($piece)) {
+					$filteredData[] = $piece->$fieldName;
+				}
+			}
+		} else {
+			foreach ($this as $piece) {
+				if (isset($piece->$fieldName)) {
 					$filteredData[] = $piece->$fieldName;
 				}
 			}
 		}
-		else
-		{
-			foreach ($this as $piece)
-			{
-				if (isset($piece->$fieldName))
-				{
-					$filteredData[] = $piece->$fieldName;
-				}
-			}
-		}
-
+		//
 		return $filteredData;
 	}
 
@@ -130,18 +117,16 @@ class ModelResult extends TypedCollection
 	/**
 	 *	Returns the contents as JSON
 	 *
-	 *
-	 *
+	 *	@return	string
 	 */
 	public function toJson()
 	{
 		$array = [];
-
-		foreach ($this as $item)
-		{
+		//
+		foreach ($this as $item) {
 			$array[] = json_decode($item->asJson());
 		}
-
+		//
 		return json_encode($array);
 	}
 

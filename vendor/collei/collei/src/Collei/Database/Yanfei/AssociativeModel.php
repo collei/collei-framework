@@ -20,7 +20,6 @@ use Collei\Support\Str;
  */
 abstract class AssociativeModel extends Model
 {
-
 	/**
 	 *	Returns the first associated model, if any
 	 *
@@ -29,12 +28,11 @@ abstract class AssociativeModel extends Model
 	protected function first()
 	{
 		$list = $this->associates ?? [];
-
-		if (count($list) < 1)
-		{
+		//
+		if (count($list) < 1) {
 			throw new DatabaseException('Undefined first associate for the associative model ' . get_class($this));
 		}
-
+		//
 		return $list[0];
 	}
 
@@ -46,12 +44,11 @@ abstract class AssociativeModel extends Model
 	protected function second()
 	{
 		$list = $this->associates ?? [];
-
-		if (count($list) < 2)
-		{
+		//
+		if (count($list) < 2) {
 			throw new DatabaseException('Undefined second associate for the associative model ' . get_class($this));
 		}
-
+		//
 		return $list[1];
 	}
 
@@ -63,12 +60,11 @@ abstract class AssociativeModel extends Model
 	protected function third()
 	{
 		$list = $this->associates ?? [];
-
-		if (count($list) < 3)
-		{
+		//
+		if (count($list) < 3) {
 			throw new DatabaseException('Undefined third associate for the associative model ' . get_class($this));
 		}
-
+		//
 		return $list[2];
 	}
 
@@ -80,12 +76,11 @@ abstract class AssociativeModel extends Model
 	protected function further(int $index)
 	{
 		$list = $this->associates ?? [];
-
-		if (count($list) < $index)
-		{
+		//
+		if (count($list) < $index) {
 			throw new DatabaseException('Undefined associate #' . $index . ' for the associative model ' . get_class($this));
 		}
-
+		//
 		return $list[$index - 1];
 	}
 

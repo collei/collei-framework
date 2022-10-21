@@ -22,50 +22,70 @@ use Collei\Support\Str;
  */
 class ModelSet
 {
+	/**
+	 *	@var array $models
+	 */
 	private $models = [];
 
+	/**
+	 *	Obtains the name of the given $model instance
+	 *
+	 *	@param	mixed	$model
+	 *	@return	string
+	 */
 	private static function nameFrom($model)
 	{
-		$classname = $model;
-
-		if (is_object($model))
-		{
-			$classname = get_class($model);
+		$className = $model;
+		//
+		if (is_object($model)) {
+			$className = get_class($model);
 		}
-
-		if ($pos = strrpos($classname, '\\'))
-		{
-			$classname = substr($classname, $pos + 1);
+		//
+		if ($pos = strrpos($className, '\\')) {
+			$className = substr($className, $pos + 1);
 		}
-
-		return $classname;
+		//
+		return $className;
 	}
 
-
+	/**
+	 *	Initializes a new instance...
+	 *
+	 *	@return	void
+	 */
 	public function __construct()
 	{
-
 	}
 
+	/**
+	 *	Appends model instances to a brand new set.
+	 *
+	 *	@param	\Collei\Database\Yanfei\Model	...$instances
+	 *	@return	\Collei\Database\Yanfei\ModelSet
+	 */
 	public static function with(Model ...$instances)
 	{
 		$that = new static();
-
-		foreach ($instances as $instance)
-		{
+		//
+		foreach ($instances as $instance) {
 			$that->models[static::nameFrom($instance)] = $instance;
 		}
-
+		//
 		return $that;
 	}
 
+	/**
+	 *	Returns the corresponding instance of the $name model
+	 *
+	 *	@param	\Collei\Database\Yanfei\Model	...$instances
+	 *	@return	\Collei\Database\Yanfei\ModelSet
+	 */
 	public function __get($name)
 	{
-		if (array_key_exists($name, $this->models))
-		{
+		if (array_key_exists($name, $this->models)) {
 			return $this->models[$name];
 		}
-
+		//
 		return null;
 	}
 
