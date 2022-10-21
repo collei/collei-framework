@@ -1,16 +1,16 @@
 supported-arguments:
 	{com}
 	{com?}
-	{com=standard}
+	{com=default}
 	{com*}
 	{com?*}
 	{com=*}
 supported-options:
 	{--opt}
-	{--opt=standard}
+	{--opt=default}
 	{--opt=*}
 	{-O|--opt}
-	{-O|--opt=standard}
+	{-O|--opt=default}
 	{-O|--opt=*}
 regex-argument:
 	(\w[\w:\-]*)(\?\*|[?*])?(=("[^"]*"|'[^']*'|[^\s}]*)?)?

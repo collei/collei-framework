@@ -8,7 +8,7 @@ use Collei\Database\Query\DB;
 use Collei\Database\Query\Query;
 use Collei\Database\Query\Clauses\Where;
 use Collei\Database\DatabaseException;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Encapsulates update tasks

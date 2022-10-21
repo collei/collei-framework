@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Console;
 
-use Collei\Utils\Collections\Properties;
-use Collei\Utils\Files\TextFile;
+use Collei\Support\Collections\Properties;
+use Collei\Support\Files\TextFile;
 
 /**
  *	This encapsulates the desired behaviour of environment variables
@@ -15,7 +15,7 @@ use Collei\Utils\Files\TextFile;
 class Environment
 {
 	/**
-	 *	@var \Collei\Utils\Collections\Properties
+	 *	@var \Collei\Support\Collections\Properties
 	 */
 	private $variables;
 

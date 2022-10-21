@@ -3,7 +3,7 @@
 use Collei\Database\Meta\DS;
 use Collei\Database\Meta\Table;
 use Collei\Database\Meta\Database;
-use Collei\Utils\Files\ConfigFile;
+use Collei\Support\Files\ConfigFile;
 
 use App\Servlets\LogonServlet;
 

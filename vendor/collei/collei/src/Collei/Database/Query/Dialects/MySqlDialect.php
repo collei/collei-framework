@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Database\Query\Dialects;
 
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Specifies the basic query structs for MySQL
@@ -41,13 +41,10 @@ class MySqlDialect extends Dialect
 	{
 		$sql = ' CREATE TABLE ' . $table . '( ';
 		$fieldren = [];
-
-		if (is_string($primaryKey))
-		{
+		//
+		if (is_string($primaryKey)) {
 			$fieldren[$primaryKey] = ' ' . $primaryKey . ' int not null auto_increment primary key ';
-		}
-		elseif (is_array($primaryKey))
-		{
+		} elseif (is_array($primaryKey)) {
 			$name = ($primaryKey['name'] ?? $primaryKey[0] ?? 'id');
 			$fieldren[$name] = ' ' . $name .
 				' ' . $this->dataTypes(
@@ -56,27 +53,21 @@ class MySqlDialect extends Dialect
 						$primaryKey['precision'] ?? $primaryKey[3] ?? null
 					) .
 				' not null ' .
-				' ' . ( ($primaryKey['auto_increment'] ?? $primaryKey[4] ?? true) ? 'auto_increment' : '' ) .
+				' ' . ( ($primaryKey['auto_increment'] ?? $primaryKey[4] ?? false) ? 'auto_increment' : '' ) .
 				' primary key ';
-		}
-		else
-		{
+		} else {
 			$fieldren['id'] = ' id int not null auto_increment primary key ';
 		}
-
-		foreach ($fields as $n => $field)
-		{
-			if (is_string($n))
-			{
+		//
+		foreach ($fields as $n => $field) {
+			if (is_string($n)) {
 				$fieldren[$n] = ' ' . $n .
 					' ' . $this->dataTypes($field['type'] ?? $field[1] ?? 'int',
 							$field['length'] ?? $field[2] ?? null,
 							$field['precision'] ?? $field[3] ?? null
 						) .
 					' ' . ( ($field['nullable'] ?? $field[4] ?? true) ? 'null' : 'not null' );
-			}
-			else
-			{
+			} else {
 				$name = ($field['name'] ?? $field[0] ?? 'id');
 				$fieldren[$name] = ' ' . $name .
 					' ' . $this->dataTypes($field['type'] ?? $field[1] ?? 'int',
@@ -86,14 +77,11 @@ class MySqlDialect extends Dialect
 					' ' . ( ($field['nullable'] ?? $field[4] ?? true) ? 'null' : 'not null' );
 			}
 		}
-
-		if (!empty($foreignKeys))
-		{
+		//
+		if (!empty($foreignKeys)) {
 			$fkn = 1;
-			foreach ($foreignKeys as $n => $field)
-			{
-				if (is_string($n))
-				{
+			foreach ($foreignKeys as $n => $field) {
+				if (is_string($n)) {
 					$fieldren[$n] = ' constraint fk_' . $table . '_' . 
 						($field['name'] ?? $field[0] ?? 'id') . '_' . $fkn .
 						' foreign key ' .
@@ -101,9 +89,7 @@ class MySqlDialect extends Dialect
 						' references ' .
 						' ' . ($field['foreign_table'] ?? $field[2]) .
 						' ( ' . ($field['foreign_index'] ?? $field[3] ?? 'id') . ')';
-				}
-				else
-				{
+				} else {
 					$name = ($field['name'] ?? $field[0] ?? 'id');
 					$fieldren[$n] = ' constraint fk_' . $table . '_' . $name . '_' . $fkn .
 						' foreign key ' .
@@ -114,9 +100,9 @@ class MySqlDialect extends Dialect
 				}
 			}
 		}
-
+		//
 		$sql .= implode(', ', $fieldren) . ');';
-
+		//
 		return $sql;
 	}
 

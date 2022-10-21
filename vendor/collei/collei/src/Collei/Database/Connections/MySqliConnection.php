@@ -7,8 +7,8 @@ use Closure;
 use Collei\Database\Box\QueryBox;
 use Collei\Database\Query\DatabaseQueryException;
 use Collei\Database\Query\Dialects\MySqlDialect;
-use Collei\Utils\Arr;
-use Collei\Utils\Parsers\DsnParser;
+use Collei\Support\Arr;
+use Collei\Support\Parsers\DsnParser;
 
 /**
  *	Encapsulates the connection features and tasks

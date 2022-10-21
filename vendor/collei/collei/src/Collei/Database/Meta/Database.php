@@ -4,7 +4,7 @@ namespace Collei\Database\Meta;
 use Closure;
 use Collei\Database\Meta\DS;
 use Collei\Database\Meta\Table;
-use Collei\Utils\Collections\Properties;
+use Collei\Support\Collections\Properties;
 use Collei\Database\Connections\Connection;
 use Collei\Database\Connections\Connector;
 
@@ -32,7 +32,7 @@ class Database
 	private $tables = [];
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties
+	 *	@var \Collei\Support\Collections\Properties
 	 */
 	private $parameters = null;
 

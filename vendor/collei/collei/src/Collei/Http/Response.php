@@ -1,7 +1,7 @@
 <?php 
 namespace Collei\Http;
 
-use Collei\Utils\Collections\Properties;
+use Collei\Support\Collections\Properties;
 
 /**
  *	Encapsulates the servlet response
@@ -12,12 +12,12 @@ use Collei\Utils\Collections\Properties;
 class Response
 {
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $headers
+	 *	@var \Collei\Support\Collections\Properties $headers
 	 */
 	private $headers = null;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $attributes
+	 *	@var \Collei\Support\Collections\Properties $attributes
 	 */
 	private $attributes = null;
 

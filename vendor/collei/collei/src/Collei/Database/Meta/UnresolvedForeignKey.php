@@ -5,8 +5,8 @@ use Collei\Database\Box\Databox;
 use Collei\Database\DatabaseException;
 use Collei\Database\Meta\Field;
 use Collei\Database\Meta\Table;
-use Collei\Utils\Values\Value;
-use Collei\Utils\Calendar\Date;
+use Collei\Support\Values\Value;
+use Collei\Support\Calendar\Date;
 
 /**
  *	Embodies a preliminary, not yet confirmed foreign key
@@ -33,17 +33,23 @@ class UnresolvedForeignKey extends Field
 	 */
 	private function resolveBonds()
 	{
-		if (is_null($this->reference_table))
-		{
-			throw new DatabaseException('No foreign table specified for the foreign key ' . $this->name . ' on ' . $this->table->name);
+		if (is_null($this->reference_table)) {
+			throw new DatabaseException(
+				'No foreign table specified for the foreign key '
+					. $this->name . ' on '
+					. $this->table->name
+			);
 		}
-
+		//
 		$table = Databox::getTable($this->reference_table);
-		if (is_null($table))
-		{
-			throw new DatabaseException('No table ' . $this->reference_table . ' was found for the foreign key ' . $this->name . ' on ' . $this->table->name . ' ');
+		if (is_null($table)) {
+			throw new DatabaseException(
+				'No table ' . $this->reference_table
+					. ' was found for the foreign key ' . $this->name
+					. ' on ' . $this->table->name . ' '
+			);
 		}
-
+		//
 		$this->reference_table = $table;
 	}
 
@@ -69,14 +75,14 @@ class UnresolvedForeignKey extends Field
 	 */
 	public function __get($name)
 	{
-		if ($name == 'foreignTable')
-		{
+		if ($name == 'foreignTable') {
 			return $this->reference_table;
 		}
-		if ($name == 'foreignTableKey')
-		{
+		//
+		if ($name == 'foreignTableKey') {
 			return $this->reference_field;
 		}
+		//
 		return parent::__get($name);
 	}
 
@@ -88,10 +94,10 @@ class UnresolvedForeignKey extends Field
 	 */
 	public function references(string $foreignPrimary)
 	{
-		if (!$this->realized())
-		{
+		if (!$this->realized()) {
 			$this->reference_field = $foreignPrimary;
 		}
+		//
 		return $this;
 	}
 
@@ -103,10 +109,10 @@ class UnresolvedForeignKey extends Field
 	 */
 	public function on(string $foreignTable)
 	{
-		if (!$this->realized())
-		{
+		if (!$this->realized()) {
 			$this->reference_table = $foreignTable;
 		}
+		//
 		return $this;
 	}
 

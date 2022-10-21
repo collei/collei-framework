@@ -4,7 +4,7 @@ namespace Collei\Auth\Models;
 use Collei\Auth\Authenticat;
 use Collei\Database\Query\DB;
 use Collei\Database\Yanfei\Model;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates methods for authentication

@@ -5,7 +5,7 @@ use Closure;
 use Collei\Database\Box\DataBox;
 use Collei\Database\Meta\Database;
 use Collei\Database\Meta\Table;
-use Collei\Utils\Files\ConfigFile;
+use Collei\Support\Files\ConfigFile;
 
 /**
  *	Shorthand helpers in class form 
@@ -16,7 +16,7 @@ use Collei\Utils\Files\ConfigFile;
 class DS extends DataBox 
 {
 	/**
-	 *	@var \Collei\Utils\Files\ConfigFile
+	 *	@var \Collei\Support\Files\ConfigFile
 	 */
 	private static $conf = null;
 

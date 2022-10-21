@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Http\Uploaders;
 
-use Collei\Filesystem\File;
+use Collei\Support\Filesystem\File;
 use Collei\Http\FileUploader;
 
 /**

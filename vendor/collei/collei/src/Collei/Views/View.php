@@ -4,7 +4,7 @@ namespace Collei\Views;
 use Collei\App\App;
 use Collei\Views\ConstructBase;
 use Collei\Views\ViewRenderer;
-use Collei\Utils\Files\TextFile;
+use Collei\Support\Files\TextFile;
 use Collei\Views\ColleiViewException;
 
 /**

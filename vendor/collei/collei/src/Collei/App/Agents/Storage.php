@@ -3,8 +3,8 @@ namespace Collei\App\Agents;
 
 use Collei\Basement;
 use Collei\App\App;
-use Collei\Filesystem\Folder;
-use Collei\Utils\Str;
+use Collei\Support\Filesystem\Folder;
+use Collei\Support\Str;
 use UnexpectedValueException;
 
 /**

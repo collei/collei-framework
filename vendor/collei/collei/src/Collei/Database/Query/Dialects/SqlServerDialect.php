@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Database\Query\Dialects;
 
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Specifies the basic query structs for SQL Server databases
@@ -58,22 +58,19 @@ class SqlServerDialect extends Dialect
 			(empty($where) ? '' : (' WHERE ' . $where)) .
 			(empty($groupBy) ? '' : (' GROUP BY ' . Arr::join(', ', $groupBy))) .
 			(empty($having) ? '' : (' HAVING ' . $having));
-
-		if (!empty($orderBy))
-		{
+		//
+		if (!empty($orderBy)) {
 			$sql .= (' ORDER BY ' . Arr::join(', ', $orderBy));
-
-			if (!empty($limit))
-			{
+			//
+			if (!empty($limit)) {
 				$offset = $offset ?? 0;
 				$offset = ($offset >= 0) ? $offset : 0;
-
 				$sql .= '' .
 					(' OFFSET ' . $offset . ' ROWS ') .
 					(' FETCH NEXT ' . $limit . ' ROWS ONLY ');
 			}
 		}
-
+		//
 		return $sql;
 	}
 	

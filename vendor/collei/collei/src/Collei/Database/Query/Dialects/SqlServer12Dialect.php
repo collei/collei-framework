@@ -2,7 +2,7 @@
 namespace Collei\Database\Query\Dialects;
 
 use Collei\Database\Query\Dialects\SqlServerDialect;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Specifies the basic query structs for SQL Server 12 (and onwards) databases
@@ -39,19 +39,17 @@ class SqlServer12Dialect extends SqlServerDialect
 			(empty($where) ? '' : (' WHERE ' . $where)) .
 			(empty($groupBy) ? '' : (' GROUP BY ' . Arr::join(', ', $groupBy))) .
 			(empty($having) ? '' : (' HAVING ' . $having));
-
-		if (!empty($orderBy))
-		{
+		//
+		if (!empty($orderBy)) {
 			$sql .= (' ORDER BY ' . Arr::join(', ', $orderBy));
-
-			if (!empty($limit))
-			{
+			//
+			if (!empty($limit)) {
 				$sql .= '' .
 					(empty($offset) ? '' : (' OFFSET ' . $offset . ' ROWS ')) .
 					(' FETCH NEXT ' . $limit . ' ROWS ONLY ');
 			}
 		}
-
+		//
 		return $sql;
 	}
 	
@@ -87,19 +85,17 @@ class SqlServer12Dialect extends SqlServerDialect
 			(empty($where) ? '' : (' WHERE ' . $where)) .
 			(empty($groupBy) ? '' : (' GROUP BY ' . Arr::join(', ', $groupBy))) .
 			(empty($having) ? '' : (' HAVING ' . $having));
-
-		if (!empty($orderBy))
-		{
+		//
+		if (!empty($orderBy)) {
 			$sql .= (' ORDER BY ' . Arr::join(', ', $orderBy));
-			
-			if (!empty($limit))
-			{
+			//
+			if (!empty($limit)) {
 				$sql .= '' .
 					(empty($offset) ? '' : (' OFFSET ' . $offset . ' ROWS ')) .
 					(' FETCH NEXT ' . $limit . ' ROWS ONLY ');
 			}
 		} 
-
+		//
 		return $sql;
 	}
 

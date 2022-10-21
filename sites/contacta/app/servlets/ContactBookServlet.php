@@ -5,10 +5,10 @@ namespace App\Servlets;
 use Collei\Http\HttpServlet;
 use Collei\Http\Request;
 use Collei\Http\Response;
-use Collei\Utils\Paging\PagingInfo;
+use Collei\Support\Paging\PagingInfo;
 use Collei\Http\DataResponse;
 
-use Collei\Filesystem\Folder;
+use Collei\Support\Filesystem\Folder;
 use Collei\Http\Uploaders\FileUploadRequest;
 use Collei\App\Agents\Storage;
 
@@ -21,8 +21,8 @@ use App\Services\ContactRetainerService;
 use App\Services\TagManagerService;
 use App\Services\QrCodeService;
 
-use Collei\Utils\Values\Capsule;
-use Collei\Utils\Parsers\RawRequestBodyParser;
+use Collei\Support\Values\Capsule;
+use Collei\Support\Parsers\RawRequestBodyParser;
 
 use App\Events\ContactAddEvent;
 use App\Listeners\ContactAddListener;
@@ -45,7 +45,6 @@ class ContactBookServlet extends HttpServlet
 	) {
 		parent::__construct($request);
 		//
-		$this->plugin_list = plat_plugin_list_info();
 		$this->contactRetainer = $contactRetainer;
 		$this->tagManager = $tagManager;
 		$this->qrcoder = $qrcode;

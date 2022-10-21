@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Console;
 
-use Collei\Utils\Collections\Properties;
-use Collei\Utils\Str;
+use Collei\Support\Collections\Properties;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates the command line

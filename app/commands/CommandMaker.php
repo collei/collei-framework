@@ -6,7 +6,7 @@ use Collei\Console\Commands\Command;
 use Collei\Console\Output\Rich\Formatter;
 use Collei\Console\Co;
 
-use Collei\Utils\Files\TextFile;
+use Collei\Support\Files\TextFile;
 
 use App\Services\SiteEngineService;
 

@@ -9,8 +9,8 @@ use Collei\Console\Commands\CommandEntries;
 use Collei\Console\Output\OutputStyler;
 use Collei\Console\Output\Rich\Formatter;
 use Collei\Console\CynoConsoleException;
-use Collei\Utils\Str;
-use Collei\Geometry\Rect;
+use Collei\Support\Str;
+use Collei\Support\Geometry\Rect;
 use Closure;
 
 /**

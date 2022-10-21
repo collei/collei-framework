@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Collei\Services\Service;
+use Collei\App\Services\Service;
 use Collei\Http\Request;
 
 class ExampleService extends Service

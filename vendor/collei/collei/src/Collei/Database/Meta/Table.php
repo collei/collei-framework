@@ -6,7 +6,7 @@ use Collei\Database\Meta\PrimaryKey;
 use Collei\Database\Meta\ForeignKey;
 use Collei\Database\Meta\UnresolvedForeignKey;
 use Collei\Database\Meta\Field;
-use Collei\Utils\Values\Value;
+use Collei\Support\Values\Value;
 
 /**
  *	Encapsulates table metadata

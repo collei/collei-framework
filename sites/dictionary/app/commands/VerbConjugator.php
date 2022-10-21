@@ -7,7 +7,7 @@ use Collei\Console\Commands\Command;
 use Collei\Console\Output\Rich\Formatter;
 use Collei\Console\Co;
 
-use Collei\Utils\Str;
+use Collei\Support\Str;
 use ColleiLang\Engine as CLE;
 
 

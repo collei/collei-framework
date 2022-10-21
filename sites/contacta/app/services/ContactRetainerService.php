@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use Collei\Services\Service;
+use Collei\App\Services\Service;
 use Collei\Http\Request;
 use Collei\Http\Uploaders\FileUploadRequest;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 use App\Models\Mean;
 use App\Models\Contact;

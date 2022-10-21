@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Console;
 
-use Collei\Servlets\Servlet;
+use Collei\App\Servlets\Servlet;
 use Collei\Console\ConsoleApp;
 use Collei\Console\CommandLine;
 use Closure;

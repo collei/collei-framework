@@ -5,9 +5,9 @@ use Collei\App\App;
 use Collei\Views\ConstructBase;
 use Collei\Views\ViewRenderer;
 use Collei\Views\ColleiViewException;
-use Collei\Utils\Files\TextFile;
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
+use Collei\Support\Files\TextFile;
+use Collei\Support\Arr;
+use Collei\Support\Str;
 use ParseError;
 use Throwable;
 
@@ -25,7 +25,7 @@ class ViewValidator
 	private $sourceName = '';
 
 	/**
-	 *	@var \Collei\Utils\Files\TextFile $sourceFile
+	 *	@var \Collei\Support\Files\TextFile $sourceFile
 	 */
 	private $sourceFile = null;
 

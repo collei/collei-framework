@@ -4,8 +4,8 @@ namespace Collei\Database\Meta;
 use Collei\Database\Meta\DS;
 use Collei\Database\Meta\Field;
 use Collei\Database\Meta\Table;
-use Collei\Utils\Values\Value;
-use Collei\Utils\Calendar\Date;
+use Collei\Support\Values\Value;
+use Collei\Support\Calendar\Date;
 use Collei\Database\DatabaseException;
 
 /**

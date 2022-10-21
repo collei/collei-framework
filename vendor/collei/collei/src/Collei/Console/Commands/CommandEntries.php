@@ -4,7 +4,7 @@ namespace Collei\Console\Commands;
 use Collei\Console\CommandLine;
 use Collei\Console\Co;
 use Collei\Console\Commands\Command;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 use Closure;
 
 /** 

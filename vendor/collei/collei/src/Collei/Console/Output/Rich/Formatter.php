@@ -3,8 +3,8 @@ namespace Collei\Console\Output\Rich;
 
 use Collei\Console\Console;
 use Collei\Console\Co;
-use Collei\Geometry\Rect;
-use Collei\Geometry\Point;
+use Collei\Support\Geometry\Rect;
+use Collei\Support\Geometry\Point;
 
 /**
  *	Encapsulates rich text formatting

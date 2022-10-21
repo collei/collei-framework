@@ -1,7 +1,7 @@
 <?php
 namespace Collei\App\Seekers;
 
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 /**
  *	Embodies class loader capabilities

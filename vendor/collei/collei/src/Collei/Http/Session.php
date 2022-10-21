@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Http;
 
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 /**
  *	@author	linblow AT hotmail DOT fr

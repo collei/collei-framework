@@ -3,7 +3,7 @@ namespace Collei\Http\Filters;
 
 use InvalidArgumentException;
 use Collei\App\App;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 use Collei\Http\Request;
 use Collei\Http\Response;
 use Collei\Http\Filters\Filter;

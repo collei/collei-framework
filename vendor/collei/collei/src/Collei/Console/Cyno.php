@@ -3,7 +3,7 @@ namespace Collei\Console;
 
 use Collei\Console\Commands\Command;
 use Collei\Console\Commands\CommandEntries;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 use Closure;
 
 /**

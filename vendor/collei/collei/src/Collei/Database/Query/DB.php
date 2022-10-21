@@ -11,7 +11,7 @@ use Collei\Database\Query\Update;
 use Collei\Database\Query\Delete;
 use Collei\Database\Query\Clauses\Where;
 use Collei\Database\DatabaseException;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Embodies basic query helper starters

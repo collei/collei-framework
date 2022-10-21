@@ -3,7 +3,7 @@ namespace Collei\Http\Uploaders;
 
 use Collei\Http\Request;
 use Collei\Http\Uploaders\UploadedFile;
-use Collei\Utils\Collections\TypedCollection;
+use Collei\Support\Collections\TypedCollection;
 
 /**
  *	Encapsulates a request with file uploading
@@ -103,7 +103,7 @@ class FileUploadRequest extends Request
 	/**
 	 *	Returns the uploaded files, if any
 	 *
-	 *	@return	\Collei\Utils\Collections\TypedCollection
+	 *	@return	\Collei\Support\Collections\TypedCollection
 	 */
 	public function getUploadedFiles()
 	{

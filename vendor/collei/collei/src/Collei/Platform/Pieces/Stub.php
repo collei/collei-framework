@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Platform\Pieces;
 
-use Collei\Utils\Files\TextFile;
-use Collei\Utils\Str;
+use Collei\Support\Files\TextFile;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates a stub file
@@ -23,7 +23,7 @@ class Stub
 	private $loaded = false;
 
 	/**
-	 *	@var \Collei\Utils\Files\TextFile $content
+	 *	@var \Collei\Support\Files\TextFile $content
 	 */
 	private $content = null;
 

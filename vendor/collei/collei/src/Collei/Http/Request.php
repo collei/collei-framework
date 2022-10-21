@@ -2,12 +2,12 @@
 namespace Collei\Http;
 
 use Collei\App\App;
-use Collei\Utils\Collections\Properties;
-use Collei\Utils\Parsers\RawRequestBodyParser;
-use Collei\Utils\Str;
+use Collei\Support\Collections\Properties;
+use Collei\Support\Parsers\RawRequestBodyParser;
+use Collei\Support\Str;
 use Collei\Http\Routing\Route;
 use Collei\Http\Routing\Routeable;
-use Collei\Pacts\Capturable;
+use Collei\Contracts\Capturable;
 use Collei\Http\Traits\MimeTypes;
 
 /**
@@ -21,37 +21,37 @@ class Request implements Routeable, Capturable
 	use MimeTypes;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $attributes
+	 *	@var \Collei\Support\Collections\Properties $attributes
 	 */
 	private $attributes;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $query
+	 *	@var \Collei\Support\Collections\Properties $query
 	 */
 	private $query;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $forms
+	 *	@var \Collei\Support\Collections\Properties $forms
 	 */
 	private $form;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $cookies
+	 *	@var \Collei\Support\Collections\Properties $cookies
 	 */
 	private $cookies;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $headers
+	 *	@var \Collei\Support\Collections\Properties $headers
 	 */
 	private $headers;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $server
+	 *	@var \Collei\Support\Collections\Properties $server
 	 */
 	private $server;
 
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $server
+	 *	@var \Collei\Support\Collections\Properties $server
 	 */
 	private $uriRootFolder = '/';
 
@@ -512,7 +512,7 @@ class Request implements Routeable, Capturable
 		];
 		//
 		if ($request->matches($pattern[1])) {
-			$file = \Collei\Utils\Str::trimPrefix($uri, ('/' . PLAT_ROOT_URI));
+			$file = \Collei\Support\Str::trimPrefix($uri, ('/' . PLAT_ROOT_URI));
 			$file = grounded('..' . str_replace('/', DIRECTORY_SEPARATOR, $file));
 		} elseif ($request->matches($pattern[2])) {
 			$file = str_replace('/', DIRECTORY_SEPARATOR, $uri);

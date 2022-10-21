@@ -1,8 +1,8 @@
 <?php 
 namespace Collei\App;
 
-use Collei\Utils\Files\TextFile;
-use Collei\Utils\Files\ConfigFile;
+use Collei\Support\Files\TextFile;
+use Collei\Support\Files\ConfigFile;
 use Collei\Exceptions\ColleiException;
 use Collei\Http\Routing\Route;
 use Collei\Http\Routing\RouteResolver;
@@ -16,7 +16,7 @@ use Collei\Views\View;
 use Collei\App\AppURL;
 use Collei\App\Logger;
 use Collei\App\Loaders\ClassLoader;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 use Collei\App\Events\AppEvent;
 use Collei\App\Events\BeforeStartEvent;
 use Collei\App\Events\AfterStartEvent;
@@ -51,7 +51,7 @@ class App
 	private $session;
 
 	/**
-	 *	@var \Collei\Utils\Files\ConfigFile $conf
+	 *	@var \Collei\Support\Files\ConfigFile $conf
 	 */
 	private $conf;
 

@@ -4,8 +4,8 @@ namespace Collei\Http\Routing;
 use Collei\App\App;
 use Collei\Http\Routing\Route;
 use Collei\Http\Routing\RouteResolver;
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
+use Collei\Support\Arr;
+use Collei\Support\Str;
 use Closure;
 
 /**

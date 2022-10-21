@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Database\Query\Clauses;
 
-use Collei\Utils\Values\Value;
-use Collei\Utils\Calendar\Date;
+use Collei\Support\Values\Value;
+use Collei\Support\Calendar\Date;
 use Collei\Database\Query\Query;
 use Collei\Database\Query\Select;
 use Collei\Database\Yanfei\Model;

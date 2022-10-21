@@ -2,9 +2,9 @@
 namespace Collei\Database\Meta;
 
 use Collei\Database\Meta\Table;
-use Collei\Utils\Values\Value;
-use Collei\Utils\Calendar\Date;
-use Collei\Pacts\Realizable;
+use Collei\Support\Values\Value;
+use Collei\Support\Calendar\Date;
+use Collei\Contracts\Realizable;
 
 /**
  *	Embodies database field metadata
@@ -15,7 +15,7 @@ use Collei\Pacts\Realizable;
 class Field implements Realizable
 {
 	/**
-	 *	@var \Collei\Utils\Values\Value
+	 *	@var \Collei\Support\Values\Value
 	 */
 	private $table = null;
 

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use Collei\Services\Service;
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
+use Collei\App\Services\Service;
+use Collei\Support\Arr;
+use Collei\Support\Str;
 
 use App\Models\Tag;
 

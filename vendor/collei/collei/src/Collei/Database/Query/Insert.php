@@ -10,7 +10,7 @@ use Collei\Database\Query\Clauses\Where;
 use Collei\Database\Query\Clauses\OrderBy;
 use Collei\Database\Query\Clauses\Join;
 use Collei\Database\DatabaseException;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Embodies the delete query properties

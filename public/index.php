@@ -19,7 +19,7 @@ require_once '../vendor/autoload.php';
  *	request handler will be loaded to deal with, so we can
  *	further proceed.
  */
-$request = \Collei\Utils\Runnable\Bolt::returnFrom(function(){
+$request = \Collei\Support\Runnable\Bolt::returnFrom(function(){
 	if (\Collei\Http\Uploaders\FileUploadRequest::hasFilesOnRequest()) {
 		return \Collei\Http\Uploaders\FileUploadRequest::capture();
 	}

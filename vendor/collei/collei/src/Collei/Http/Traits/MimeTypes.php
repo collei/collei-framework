@@ -2,7 +2,7 @@
 namespace Collei\Http\Traits;
 
 use Collei\Http\Response;
-use Collei\Utils\Collections\Properties;
+use Collei\Support\Collections\Properties;
 	
 /**
  *	Encapsulates the servlet response
@@ -103,13 +103,12 @@ trait MimeTypes
 	 */
 	public function mimeFromFileName(string $fileName, string $defaultMime = 'text/plain')
 	{
-		if ($pos = strrpos($fileName, '.'))
-		{
+		if ($pos = strrpos($fileName, '.')) {
 			$ext = substr($fileName, $pos);
-
+			//
 			return $this->mimeFromExtension($ext, $defaultMime);
 		}
-
+		//
 		return $defaultMime;
 	}
 

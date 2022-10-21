@@ -4,8 +4,8 @@ namespace Collei\Database\Relations;
 use Collei\Database\Yanfei\Model;
 use Collei\Database\Query\DB;
 use Collei\Database\Relations\Relation;
-use Collei\Utils\Collections\Collection;
-use Collei\Utils\Arr;
+use Collei\Support\Collections\Collection;
+use Collei\Support\Arr;
 
 /**
  *	Embodies many-to-many relations

@@ -10,10 +10,10 @@ use Collei\Database\Query\Select;
 use Collei\Database\Query\Clauses\Where;
 use Collei\Database\Relations\OneToMany;
 use Collei\Database\Relations\ManyToMany;
-use Collei\Pacts\Jsonable;
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
-use Collei\Utils\Calendar\Date;
+use Collei\Contracts\Jsonable;
+use Collei\Support\Arr;
+use Collei\Support\Str;
+use Collei\Support\Calendar\Date;
 
 /**
  *	Encapsulates a given database Model, its attributes and methods

@@ -1,11 +1,11 @@
 <?php
 namespace Collei\App\Loaders;
 
-require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/Utils/Logging/LogFileTrait.php';
+//require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/Utils/Logging/LogFileTrait.php';
 
 
-use Collei\Utils\Values\Value;
-use Collei\Utils\Logging\LogFileTrait;
+use Collei\Support\Values\Value;
+use Collei\Support\Logging\LogFileTrait;
 use ReflectionClass;
 use ReflectionMethod;
 use Exception;

@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Database\Query\Dialects;
 
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
+use Collei\Support\Arr;
+use Collei\Support\Str;
 
 /**
  *	Specifies the basic query structs for certain database brands
@@ -27,10 +27,10 @@ abstract class Dialect
 	 */
 	public final function functions(string $function)
 	{
-		if (array_key_exists($function, $this->functions))
-		{
+		if (array_key_exists($function, $this->functions)) {
 			return $this->functions[$function];
 		}
+		//
 		return '';
 	}
 
@@ -52,26 +52,27 @@ abstract class Dialect
 	 *	@param	string	$dataTypes
 	 *	@return	string	
 	 */
-	public final function dataTypes(string $dataType, int $length = null, int $precision = null)
-	{
-		if (array_key_exists($dataType, $this->dataTypes))
-		{
+	public final function dataTypes(
+		string $dataType, int $length = null, int $precision = null
+	) {
+		if (array_key_exists($dataType, $this->dataTypes)) {
 			$details = '';
-
-			if (Str::in($dataType, ['string','text']))
-			{
+			//
+			if (Str::in($dataType, ['string','text'])) {
 				$details = (empty($length) ? '50' : '');
-			}
-			elseif (Str::in($dataType, ['float','real','double','decimal','currency']))
-			{
+			} elseif (
+				Str::in($dataType, ['float','real','double','decimal','currency'])
+			) {
 				$details = (
 					empty($length)
 						? '' 
 						: $length . (empty($precision) ? '' : (',' . $precision))
 				);
 			}
-
-			return $this->dataTypes[$dataType] . (empty($details) ? '' : ('(' . $details . ')'));
+			//
+			return $this->dataTypes[$dataType] . (
+				empty($details) ? '' : ('(' . $details . ')')
+			);
 		}
 		return '';
 	}
@@ -180,8 +181,9 @@ abstract class Dialect
 	 *	@param	string	$where
 	 *	@return	string
 	 */
-	public function update(string $table, array $setFields, string $where = null)
-	{
+	public function update(
+		string $table, array $setFields, string $where = null
+	) {
 		return ' UPDATE ' . $table .
 			' SET ' . Arr::joinKeyValueHolders(',', $setFields, function($n, $v){ return " $n = $v"; }) .
 			(empty($where) ? '' : (' WHERE ' . $where)) . ';';
@@ -196,8 +198,12 @@ abstract class Dialect
 	 *	@param	mixed	$primaryKey
 	 *	@param	array	$foreignKeys
 	 */
-	public function createTable(string $table, array $fields, $primaryKey = null, array $foreignKeys = null)
-	{
+	public function createTable(
+		string $table,
+		array $fields,
+		$primaryKey = null,
+		array $foreignKeys = null
+	) {
 		return '';
 	}
 

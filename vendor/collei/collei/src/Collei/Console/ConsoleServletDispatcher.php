@@ -7,7 +7,7 @@ use ReflectionMethod;
 use ReflectionFunction;
 use Collei\Console\ConsoleApp;
 use Collei\Console\Commands\Command;
-use Collei\Services\Service;
+use Collei\App\Services\Service;
 
 /**
  *	Encapsulates console servet dispatching

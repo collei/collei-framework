@@ -8,10 +8,10 @@ use Collei\Http\Routing\Route;
 use Collei\Http\Request;
 use Collei\Http\Response;
 use Collei\Http\HttpServlet;
-use Collei\Servlets\Servlet;
-use Collei\Services\Service;
+use Collei\App\Servlets\Servlet;
+use Collei\App\Services\Service;
 use Collei\Http\Uploaders\FileUploadRequest;
-use Collei\Utils\Arr;
+use Collei\Support\Arr;
 
 /**
  *	Encapsulates the servlet caller

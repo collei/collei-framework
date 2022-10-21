@@ -3,7 +3,7 @@ namespace Collei\Http;
 
 use Collei\Http\Response;
 use Collei\Http\Traits\MimeTypes;
-use Collei\Utils\Collections\Properties;
+use Collei\Support\Collections\Properties;
 
 /**
  *	Encapsulates the servlet response

@@ -3,7 +3,7 @@ namespace Collei\Http\Routing;
 
 use Collei\App\App;
 use Collei\Http\Routing\RouteResolver;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates route features and tasks

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use Collei\Services\Service;
+use Collei\App\Services\Service;
 use Collei\Http\Request;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 use Collei\Platform\Pieces\Stub;
 
 class SiteEngineService extends Service

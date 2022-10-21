@@ -9,8 +9,8 @@ use Collei\Database\Yanfei\Model;
 use Collei\Database\Query\DB;
 use Collei\Database\Query\Select;
 use Collei\Database\Query\Clauses\Where;
-use Collei\Utils\Arr;
-use Collei\Utils\Str;
+use Collei\Support\Arr;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates associative models

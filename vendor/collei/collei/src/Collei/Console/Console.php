@@ -4,8 +4,8 @@ namespace Collei\Console;
 use Collei\Console\Co;
 use Collei\Console\Output\RGBColor;
 use Collei\System\Terminal;
-use Collei\Utils\Number;
-use Collei\Utils\Values\Capsule;
+use Collei\Support\Number;
+use Collei\Support\Values\Capsule;
 
 /**
  *	This class encapsulates basic tasks with console 

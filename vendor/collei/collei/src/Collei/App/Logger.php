@@ -1,7 +1,7 @@
 <?php
 namespace Collei\App;
 
-use Collei\Utils\Files\TextFile;
+use Collei\Support\Files\TextFile;
 
 /**
  *	Encapsulates logging tasks and capabilities
@@ -98,10 +98,8 @@ class Logger
 	{
 		$logs = array();
 		//
-		foreach (self::$logger_registry as $sector => $items)
-		{
-			foreach ($items as $item)
-			{
+		foreach (self::$logger_registry as $sector => $items) {
+			foreach ($items as $item) {
 				$item['section'] = $sector;
 				$logs[] = $item;
 			}
@@ -118,8 +116,7 @@ class Logger
 	 */
 	public static function save(string $prefix = null)
 	{
-		if (count(self::$logger_registry) > 0)
-		{
+		if (count(self::$logger_registry) > 0) {
 			$filename = PLAT_LOGS_GROUND . DIRECTORY_SEPARATOR 
 				. '.'
 				. ( (!is_null($prefix) && ($prefix!='')) ? $prefix . '-' : '')

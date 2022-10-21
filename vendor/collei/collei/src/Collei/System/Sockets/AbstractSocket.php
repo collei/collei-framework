@@ -3,7 +3,7 @@ namespace Collei\System\Sockets;
 
 use Collei\System\Sockets\SocketException;
 use Collei\System\Sockets\ClientSocket;
-use Collei\Utils\Logging\LoggerTrait;
+use Collei\Support\Logging\LoggerTrait;
 use DateTime;
 
 /**

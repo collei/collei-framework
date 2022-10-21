@@ -6,8 +6,8 @@ use Collei\Console\ConsoleServletDispatcher;
 use Collei\Console\Commands\Command;
 use Collei\Console\Commands\CommandEntries;
 use Collei\Console\Co;
-use Collei\Utils\Runnable\Runnable;
-use Collei\Utils\Str;
+use Collei\Support\Runnable\Runnable;
+use Collei\Support\Str;
 
 /**
  *	Encapsulates the console application running instance

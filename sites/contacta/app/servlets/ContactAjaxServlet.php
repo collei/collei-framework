@@ -9,7 +9,7 @@ use Collei\Http\DataResponse;
 use App\Services\ContactRetainerService;
 use App\Services\TagManagerService;
 
-use Collei\Utils\Parsers\RawRequestBodyParser;
+use Collei\Support\Parsers\RawRequestBodyParser;
 
 /**
  *	this processes requests and returns results.

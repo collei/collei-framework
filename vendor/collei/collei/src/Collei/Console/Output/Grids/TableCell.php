@@ -1,8 +1,8 @@
 <?php
 namespace Collei\Console\Output\Grids;
 
-use Collei\Geometry\Rect;
-use Collei\Geometry\Point;
+use Collei\Support\Geometry\Rect;
+use Collei\Support\Geometry\Point;
 use Collei\Console\Output\OutputFormatInterface;
 use Collei\Console\Console;
 use Collei\Console\Co;

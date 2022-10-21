@@ -2,9 +2,9 @@
 
 namespace App\Models\Services;
 
-use Collei\Services\Service;
+use Collei\App\Services\Service;
 use Collei\Http\Request;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 use App\Models\Entry;
 use App\Models\Meaning;

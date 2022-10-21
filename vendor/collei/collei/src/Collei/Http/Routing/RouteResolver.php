@@ -4,7 +4,7 @@ namespace Collei\Http\Routing;
 use Collei\App\App;
 use Collei\Http\Request;
 use Collei\Http\Routing\Route;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 /**
  *	Embodies router resolving

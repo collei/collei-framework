@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Console\Output;
 
-use Collei\Utils\Number;
+use Collei\Support\Number;
 
 /**
  *	This class encapsulates a RGB color and some of common conversion routines

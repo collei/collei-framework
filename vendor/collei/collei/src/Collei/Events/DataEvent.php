@@ -1,7 +1,7 @@
 <?php
 namespace Collei\Events;
 
-use Collei\Utils\Collections\Properties;
+use Collei\Support\Collections\Properties;
 
 use Collei\Events\Event;
 use Collei\Events\DataEventInterface;
@@ -16,7 +16,7 @@ use Collei\Events\DataEventInterface;
 class DataEvent extends Event implements DataEventInterface
 {
 	/**
-	 *	@var \Collei\Utils\Collections\Properties $data
+	 *	@var \Collei\Support\Collections\Properties $data
 	 */
 	private $data = null;
 

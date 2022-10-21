@@ -3,7 +3,7 @@
 use Collei\Console\Cyno;
 use Collei\Console\Co;
 use Collei\Console\Output\RGBColor;
-use Collei\Utils\Str;
+use Collei\Support\Str;
 
 //use Exception;
 //use Throwable;
@@ -12,13 +12,13 @@ use Collei\System\Process;
 
 use Collei\Auth\Ldap\Ldap;
 
-use Collei\Utils\Values\TextStream;
+use Collei\Support\Values\TextStream;
 
 use Collei\Console\Output\OutputFormat;
 use Collei\Console\Output\Grids\Table;
-use Collei\Geometry\Point;
+use Collei\Support\Geometry\Point;
 
-use Collei\Geometry\Rect;
+use Collei\Support\Geometry\Rect;
 use Collei\Console\Output\Rich\Formatter;
 
 use Collei\System\Sockets\Socket;

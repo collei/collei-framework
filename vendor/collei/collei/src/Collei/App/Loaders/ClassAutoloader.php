@@ -1,13 +1,10 @@
 <?php
 namespace Collei\App\Loaders;
 
-require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/Utils/Logging/LogFileTrait.php';
-require_once PLAT_VENDOR_GROUND . '/collei/collei/src/Collei/App/Environment.php';
-
 use Collei\App\Environment;
 use Collei\App\App;
 use Collei\App\Loaders\ClassLoader;
-use Collei\Utils\Logging\LogFileTrait;
+use Collei\Support\Logging\LogFileTrait;
 use DateTime;
 
 /**
